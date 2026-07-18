@@ -1,315 +1,177 @@
 # 🔁 06 — Recursion
 
-> 🪞 **Explain Like I'm 5:** Stand between two mirrors facing each other. You see yourself, inside a smaller you, inside a smaller you… forever. Each reflection is the *same picture, just smaller.* That's recursion — **a function that calls a smaller copy of itself.**
+> **Explain Like I'm 5:** Stand between two mirrors facing each other. You see yourself, inside a smaller you, inside a smaller you… forever. Each reflection is the *same picture, just smaller.* That's recursion — **a function that calls a smaller copy of itself.**
 >
 > But mirrors going on forever never finish. So recursion needs a **wall to stop at.** That stopping point is called the **base case.**
 
-> 💛 Recursion feels scary on day one for *everybody*. By the end of this file it'll feel natural. Go slow, dry-run on paper, and trust the process.
+---
+
+## 💻 Under the Hood: The Execution Call Stack
+
+To understand recursion, you must understand how the computer executes function calls.
+Whenever a function is called, the computer allocates a block of memory called a **Stack Frame** (or Activation Record) on top of the **Call Stack**.
+
+### What's inside a Stack Frame?
+1. **Local Variables:** Variables declared inside the function.
+2. **Parameters:** Values passed into the function (e.g. `n`).
+3. **Return Address:** The line of code to jump back to once the function finishes.
+
+### Visualizing Stack Frames for `factorial(3)`
+Each function call pushes a new frame. They sit on top of each other. The computer can only interact with the frame on the very top.
+
+```
+Pushes (Calls)                          Pops (Returns)
+┌───────────────────────┐               ┌───────────────────────┐
+│ factorial(1) [n=1]    │               │ factorial(1) returns 1│ (Popped!)
+├───────────────────────┤               ├───────────────────────┤
+│ factorial(2) [n=2]    │               │ factorial(2) returns 2│ (2 * 1)
+├───────────────────────┤               ├───────────────────────┤
+│ factorial(3) [n=3]    │               │ factorial(3) returns 6│ (3 * 2)
+└───────────────────────┘               └───────────────────────┘
+     Call Stack (GROWING)                   Call Stack (SHRINKING)
+```
+
+If your code doesn't hit a base case, it keeps pushing frames until it runs out of memory, causing a **`StackOverflowError`**.
 
 ---
 
-## The 3 Ingredients (Every Recursion Has These)
+## 🧮 The Leap of Faith: Mathematical Induction
 
-> Miss any one of these and your function calls itself forever → **StackOverflowError** (the computer runs out of memory).
+Writing recursion is about **trust**. Do not try to trace all the calls in your head. Instead, think of it like **Mathematical Induction**:
 
-1. **Base case** — the condition that *stops* the recursion (the wall).
-2. **Recursive call** — the function calls itself on a **smaller** input.
-3. **Progress** — each call must move *closer* to the base case (the input shrinks).
+1. **Prove the Base Case:** Show that the code works for the smallest input (e.g. $n = 0$ or $n = 1$).
+2. **Assume the Hypothesis:** Assume that the recursive call `solve(n - 1)` works correctly. (Do not trace it; trust that it returns the correct value.)
+3. **Write the Inductive Step:** Use the result of `solve(n - 1)` to build the answer for `solve(n)`.
 
----
-
-## The Big Idea: "Down vs Up" (Read This Twice)
-
-This single idea explains *everything* about recursion:
-
-> 🪜 Think of a staircase. You walk **DOWN** to the ground floor, then walk **UP** doing work.
->
-> - Work written **before** the recursive call → happens on the way **DOWN** (top-to-bottom order).
-> - Work written **after** the recursive call → happens on the way **UP** (bottom-to-top order).
->
-> **The recursive call is the dividing line.** That's the whole secret.
+*Example (Factorial):*
+- Base Case: `factorial(1) = 1`
+- Hypothesis: Assume `factorial(n - 1)` correctly computes $(n-1)!$
+- Inductive Step: `factorial(n) = n * factorial(n - 1)` (Correct!)
 
 ---
 
-## The Leap of Faith (The Real Skill)
+## 🪜 The Staircase Analogy: "Down vs. Up"
 
-> Don't try to trace the whole thing in your head. **Assume the smaller call already returns the correct answer**, then just decide what to do with it.
->
-> Example: `factorial(n) = n × (whatever factorial(n-1) gives me)`.
-> You don't recompute `factorial(n-1)` in your head — you *trust* it. That trust is the skill.
+The position of your code relative to the recursive call determines when it runs:
+
+- **Work written BEFORE the recursive call:** Executed on the way **DOWN** (top-to-bottom).
+- **Work written AFTER the recursive call:** Postponed and executed on the way **UP** (bottom-to-top).
+
+```
+          [Call Stack Entry]
+                  │
+        (1. Work on way DOWN)
+                  │
+        [Recursive call solve(n-1)] ──► (Dives deeper)
+                  │
+        (2. Work on way UP)
+                  │
+         [Call Stack Exit]
+```
 
 ---
 
-## Example 1 — Print N to 1 (work on the way DOWN)
+## 🎨 Tree Recursion: Fibonacci
 
-> "I'll print `3`, then ask a smaller version of myself to print everything from `2` down. I do one line, delegate the rest."
+When a function calls itself **twice**, the execution path forms a **Recursion Tree** rather than a straight line.
+
+```
+                                 fib(4)
+                               /        \
+                            fib(3)      fib(2)  (Wasted duplicate work!)
+                           /      \     /    \
+                       fib(2)   fib(1) fib(1) fib(0)
+                       /    \
+                    fib(1) fib(0)
+```
+
+- **Time Complexity:** $O(2^n)$ — The tree roughly doubles in size at each level.
+- **Space Complexity:** $O(n)$ — The maximum stack depth matches the height of the tree. Only one branch is stored in the call stack at any single moment.
+
+---
+
+## 🎯 Practice Problems & Worked Solutions
+
+Verify your recursion logic with these 8 foundational problems.
+
+| # | Problem | Type | Link | Key Idea |
+|---|---|---|---|---|
+| 1 | Print 1 to N | Linear (Up) | [GeeksforGeeks](https://www.geeksforgeeks.org/problems/print-1-to-n-without-using-loops-1587115620/1) | Print after the recursive call. |
+| 2 | Factorial | Linear (Return) | [GeeksforGeeks](https://www.geeksforgeeks.org/problems/factorial5739/1) | $N \times (N-1)!$ |
+| 3 | Sum of first N | Linear (Return) | [GeeksforGeeks](https://www.geeksforgeeks.org/problems/sum-of-first-n-terms5843/1) | $N + Sum(N-1)$ |
+| 4 | Power(x, n) | Linear/Log | [LeetCode](https://leetcode.com/problems/powx-n/) | Divide and conquer exponents. |
+| 5 | Fibonacci Number | Tree | [LeetCode](https://leetcode.com/problems/fibonacci-number/) | Sum of two previous states. |
+| 6 | Reverse a String | Linear | [LeetCode](https://leetcode.com/problems/reverse-string/) | `reverse(rest) + first`. |
+| 7 | Valid Palindrome | Two-Pointer | [LeetCode](https://leetcode.com/problems/valid-palindrome/) | Pointers checking inward recursively. |
+| 8 | Binary Search | Divide & Conquer | [LeetCode](https://leetcode.com/problems/binary-search/) | Search bounds halved recursively. |
+
+---
+
+### Solution 1: Print 1 to N
+
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(n)$ stack frames.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static void printNto1(int n) {
-    if (n == 0) {                 // base case — stop here
-        return;
-    }
-    System.out.println(n);        // do MY one line of work...
-    printNto1(n - 1);             // ...then delegate the smaller problem
+public void print1toN(int n) {
+    if (n == 0) return; // Base case
+    print1toN(n - 1);   // Go down the stack first
+    System.out.println(n); // Print on the way UP
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
-```python
-def print_n_to_1(n):
-    if n == 0:                    # base case — stop here
-        return
-    print(n)                      # do MY one line of work...
-    print_n_to_1(n - 1)           # ...then delegate the smaller problem
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-void printNto1(int n) {
-    if (n == 0) {                 // base case — stop here
-        return;
-    }
-    cout << n << endl;            // do MY one line of work...
-    printNto1(n - 1);             // ...then delegate the smaller problem
-}
-```
-</details>
-
-**Dry run — `printNto1(3)`:**
-
-| Call | What it does | Then calls |
-|------|--------------|-----------|
-| printNto1(3) | prints **3** | printNto1(2) |
-| printNto1(2) | prints **2** | printNto1(1) |
-| printNto1(1) | prints **1** | printNto1(0) |
-| printNto1(0) | base case | returns |
-
-**Output:** `3 2 1` — each printed on the way **down**, *before* the smaller call ran.
-
-> ⏱️ **Time:** O(n) · **Space:** O(n) — `n` calls are stacked up waiting at once.
-
----
-
-## Example 2 — The "Aha" Twist: Print 1 to N (work on the way UP)
-
-> Same four lines. Just move the print to **after** the recursive call. Now it prints on the way **up**, and the output flips!
-
-<details>
-<summary>☕ Java</summary>
-
-```java
-public static void print1toN(int n) {
-    if (n == 0) {
-        return;
-    }
-    print1toN(n - 1);             // go ALL the way down first...
-    System.out.println(n);        // ...print on the way back UP
-}
-```
-</details>
-
-<details>
-<summary>🐍 Python</summary>
-
-```python
-def print_1_to_n(n):
-    if n == 0:
-        return
-    print_1_to_n(n - 1)           # go ALL the way down first...
-    print(n)                      # ...print on the way back UP
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-void print1toN(int n) {
-    if (n == 0) {
-        return;
-    }
-    print1toN(n - 1);             // go ALL the way down first...
-    cout << n << endl;            // ...print on the way back UP
-}
-```
-</details>
-
-**Output:** `1 2 3` — same code, *one line moved*, opposite result.
-
-> ⭐ **The line to remember forever:** Work *before* the call → way **down**. Work *after* the call → way **up**.
-
----
-
-## Example 3 — Fibonacci (when a function calls itself TWICE)
-
-> Each Fibonacci number is the sum of the two before it: `0, 1, 1, 2, 3, 5, 8…`
-> So `fib(n) = fib(n-1) + fib(n-2)` — **two** recursive calls. This makes a **tree**, not a straight line.
-
-<details>
-<summary>☕ Java</summary>
-
-```java
-public static int fib(int n) {
-    if (n == 0 || n == 1) {       // two base cases (two seeds)
-        return n;
-    }
-    return fib(n - 1) + fib(n - 2);   // TWO calls → branching
-}
-```
-</details>
-
-<details>
-<summary>🐍 Python</summary>
-
-```python
-def fib(n):
-    if n == 0 or n == 1:          # two base cases (two seeds)
-        return n
-    return fib(n - 1) + fib(n - 2)    # TWO calls → branching
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-int fib(int n) {
-    if (n == 0 || n == 1) {       // two base cases (two seeds)
-        return n;
-    }
-    return fib(n - 1) + fib(n - 2);   // TWO calls → branching
-}
-```
-</details>
-
-**The recursion tree for `fib(4)`:**
-```
-fib(4)
-├── fib(3)
-│   ├── fib(2)
-│   │   ├── fib(1) = 1
-│   │   └── fib(0) = 0
-│   └── fib(1) = 1
-└── fib(2)            ← computed a SECOND time! (wasted work)
-    ├── fib(1) = 1
-    └── fib(0) = 0
-```
-
-> ⏱️ **Time:** O(2ⁿ) — the tree roughly **doubles** each level. `fib(40)` is painfully slow! · **Space:** O(n) — only one path from root to leaf sits on the stack at once.
->
-> 🔮 **This slowness gets fixed later** by *remembering* answers we already computed — that's **memoization → Dynamic Programming**. For now, just *see* the repeated work.
-
----
-
-## 🪜 The Golden Rule — How To Dry-Run ANY Recursion
-
-> 1. **Write the calls going DOWN** — peel the problem apart until the input can't shrink anymore.
-> 2. **Stop at the base case** — that's your turning point, the ground floor.
-> 3. **Walk back UP** — resolve each waiting line using the value returned from below.
-
-Staircase, every time: **down to the ground floor, then back up doing the work you postponed.**
-
----
-
-# 🎯 Practice — The 8 That Cover ~80% of Interviews
-
-> Master these 8 and you'll recognise most recursion in placement interviews. Everything harder is just these combined. **Worked solutions below** — but *try each yourself first*, then check.
-
-| # | Problem | Type | Practice Link |
-|---|---------|------|---------------|
-| 1 | Print 1 to N | linear (up) | https://www.geeksforgeeks.org/problems/print-1-to-n-without-using-loops-1587115620/1 |
-| 2 | Factorial | linear (return) | https://www.geeksforgeeks.org/problems/factorial5739/1 |
-| 3 | Sum of first N | linear (return) | https://www.geeksforgeeks.org/problems/sum-of-first-n-terms5843/1 |
-| 4 | Power(x, n) | linear (return) | https://leetcode.com/problems/powx-n/ |
-| 5 | Fibonacci Number | tree | https://leetcode.com/problems/fibonacci-number/ |
-| 6 | Reverse a String | linear (string) | https://leetcode.com/problems/reverse-string/ |
-| 7 | Valid Palindrome | two-pointer | https://leetcode.com/problems/valid-palindrome/ |
-| 8 | Binary Search (recursive) | divide & conquer | https://leetcode.com/problems/binary-search/ |
-
----
-
-## ✅ Solution 1 — Print 1 to N
-
-(Full explanation above in Example 2.) The trick is printing **after** the call.
-
-<details>
-<summary>☕ Java</summary>
-
-```java
-public static void print1toN(int n) {
-    if (n == 0) return;
-    print1toN(n - 1);
-    System.out.println(n);
-}
-```
-</details>
-
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def print_1_to_n(n):
     if n == 0:
         return
-    print_1_to_n(n - 1)
-    print(n)
+    print_1_to_n(n - 1)  # Go down the stack first
+    print(n)            # Print on the way UP
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 void print1toN(int n) {
     if (n == 0) return;
-    print1toN(n - 1);
-    cout << n << endl;
+    print1toN(n - 1);   // Go down the stack first
+    cout << n << endl;  // Print on the way UP
 }
 ```
 </details>
-
-> ⏱️ Time O(n) · Space O(n)
 
 ---
 
-## ✅ Solution 2 — Factorial
+### Solution 2: Factorial
 
-> `n! = n × (n-1)!`. Base case `n <= 1` returns 1. **(Use `<= 1`, not `== 1`, so `factorial(0)` doesn't loop forever!)**
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(n)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static int factorial(int n) {
-    if (n <= 1) return 1;                 // safe base case
-    return n * factorial(n - 1);          // trust smaller call, then multiply
+public int factorial(int n) {
+    if (n <= 1) return 1; // Base case (prevents infinite loop for n=0)
+    return n * factorial(n - 1); // Inductive step
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def factorial(n):
     if n <= 1:
         return 1
     return n * factorial(n - 1)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 int factorial(int n) {
     if (n <= 1) return 1;
@@ -318,48 +180,34 @@ int factorial(int n) {
 ```
 </details>
 
-**Dry run — `factorial(4)`:**
-
-| Down (break apart) | Up (resolve) |
-|--------------------|--------------|
-| factorial(4) = 4 × factorial(3) | = 4 × 6 = **24** |
-| factorial(3) = 3 × factorial(2) | = 3 × 2 = 6 |
-| factorial(2) = 2 × factorial(1) | = 2 × 1 = 2 |
-| factorial(1) = 1 (base case) | returns 1 |
-
-> ⏱️ Time O(n) · Space O(n)
-
 ---
 
-## ✅ Solution 3 — Sum of First N
+### Solution 3: Sum of First N
 
-> **Exact same skeleton as factorial — just swap `×` for `+`.** Once you see this, you've stopped memorising and started *recognising structure*.
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(n)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static int sum(int n) {
+public int sum(int n) {
     if (n == 0) return 0;
-    return n + sum(n - 1);                // same shape, + instead of ×
+    return n + sum(n - 1);
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def sum_to_n(n):
     if n == 0:
         return 0
     return n + sum_to_n(n - 1)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 int sum(int n) {
     if (n == 0) return 0;
@@ -368,271 +216,289 @@ int sum(int n) {
 ```
 </details>
 
-**Dry run — `sum(4)`:** 4 + 3 + 2 + 1 = **10**
-
-> ⏱️ Time O(n) · Space O(n)
-
 ---
 
-## ✅ Solution 4 — Power(x, n)
+### Solution 4: Power(x, n) (Optimized Binary Exponentiation)
 
-> `x^n = x × x^(n-1)`. Base case: anything to the power 0 is 1.
-> *(Below is the simple O(n) version — perfect for learning. A faster O(log n) "fast power" exists, but understand this first.)*
+**Intuition:** 
+Instead of calculating $x^n$ linearily ($O(n)$), we can divide the exponent in half at each step:
+- If $n$ is even: $x^n = (x^{n/2})^2$
+- If $n$ is odd: $x^n = x \times (x^{n/2})^2$
+This reduces the time complexity from $O(n)$ to $O(\log n)$.
+
+**Complexity:**
+- **Time:** $O(\log n)$
+- **Space:** $O(\log n)$ stack memory.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static double power(double x, int n) {
-    if (n == 0) return 1;                 // base case: x^0 = 1
-    if (n < 0) return 1 / power(x, -n);   // handle negative powers
-    return x * power(x, n - 1);
+public double myPow(double x, int n) {
+    long N = n;
+    if (N < 0) {
+        x = 1 / x;
+        N = -N;
+    }
+    return fastPow(x, N);
+}
+
+private double fastPow(double x, long n) {
+    if (n == 0) return 1.0;
+    double half = fastPow(x, n / 2);
+    if (n % 2 == 0) {
+        return half * half;
+    } else {
+        return half * half * x;
+    }
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def power(x, n):
-    if n == 0:
-        return 1                          # base case: x^0 = 1
+def my_pow(x, n):
     if n < 0:
-        return 1 / power(x, -n)           # handle negative powers
-    return x * power(x, n - 1)
+        x = 1 / x
+        n = -n
+    
+    def fast_pow(val, exp):
+        if exp == 0:
+            return 1.0
+        half = fast_pow(val, exp // 2)
+        if exp % 2 == 0:
+            return half * half
+        else:
+            return half * half * val
+            
+    return fast_pow(x, n)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
-double power(double x, int n) {
-    if (n == 0) return 1;                 // base case: x^0 = 1
-    if (n < 0) return 1 / power(x, -n);   // handle negative powers
-    return x * power(x, n - 1);
+double fastPow(double x, long long n) {
+    if (n == 0) return 1.0;
+    double half = fastPow(x, n / 2);
+    if (n % 2 == 0) {
+        return half * half;
+    } else {
+        return half * half * x;
+    }
+}
+
+double myPow(double x, int n) {
+    long long N = n;
+    if (N < 0) {
+        x = 1 / x;
+        N = -N;
+    }
+    return fastPow(x, N);
 }
 ```
 </details>
 
-**Dry run — `power(2, 3)`:** 2 × 2 × 2 × 1 = **8**
-
-> ⏱️ Time O(n) · Space O(n)
-
 ---
 
-## ✅ Solution 5 — Fibonacci Number
+### Solution 5: Fibonacci Number
 
-(Full tree explanation above in Example 3.)
+**Complexity:**
+- **Time:** $O(2^n)$
+- **Space:** $O(n)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static int fib(int n) {
-    if (n == 0 || n == 1) return n;
+public int fib(int n) {
+    if (n <= 1) return n;
     return fib(n - 1) + fib(n - 2);
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def fib(n):
-    if n == 0 or n == 1:
+    if n <= 1:
         return n
     return fib(n - 1) + fib(n - 2)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 int fib(int n) {
-    if (n == 0 || n == 1) return n;
+    if (n <= 1) return n;
     return fib(n - 1) + fib(n - 2);
 }
 ```
 </details>
 
-> ⏱️ Time O(2ⁿ) · Space O(n) — remember the repeated-work tree!
-
 ---
 
-## ✅ Solution 6 — Reverse a String
+### Solution 6: Reverse a String
 
-> **Idea:** Chip off the first character, recurse on the rest, then stick that first char at the **end**. Pure leap of faith — trust `reverse` to handle the middle.
+**Intuition:** 
+Reverse the substring starting at index 1, and append the first character to the end of that reversed substring.
+`reverse("abc")` = `reverse("bc")` + `'a'`.
+
+**Complexity:**
+- **Time:** $O(n^2)$ (due to string slicing and copying in Java/Python).
+- **Space:** $O(n)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static String reverse(String s) {
-    if (s.length() <= 1) return s;                // base: empty or 1 char
-    return reverse(s.substring(1)) + s.charAt(0); // first char goes to the END
+public String reverse(String s) {
+    if (s.length() <= 1) return s;
+    return reverse(s.substring(1)) + s.charAt(0);
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def reverse(s):
     if len(s) <= 1:
         return s
-    return reverse(s[1:]) + s[0]                   # first char goes to the END
+    return reverse(s[1:]) + s[0]
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
-string reverse(string s) {
-    if (s.size() <= 1) return s;
-    return reverse(s.substr(1)) + s[0];           // first char goes to the END
+string reverseString(string s) {
+    if (s.length() <= 1) return s;
+    return reverseString(s.substr(1)) + s[0];
 }
 ```
 </details>
 
-**Dry run — `reverse("abc")`:** `reverse("bc") + 'a'` → `reverse("c")+'b' + 'a'` → `"c" + "b" + "a"` = **"cba"**
-
-> ⏱️ Time O(n) · Space O(n)
-
-> 💡 The LeetCode version gives you a `char[]` and wants it reversed in-place — there you'd use the **two-pointer** method from the Two-Pointers file. This recursive version is to *understand* the idea.
-
 ---
 
-## ✅ Solution 7 — Valid Palindrome (recursive, two-pointer)
+### Solution 7: Valid Palindrome (Recursive Two-Pointer)
 
-> **Idea:** Compare the two ends. If they match, ask: "is the *inside* also a palindrome?" Base case: pointers cross (`left >= right`) → yes.
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(n)$ stack frames.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static boolean isPalindrome(String s, int left, int right) {
-    if (left >= right) return true;               // base: pointers crossed
+public boolean isPalindrome(String s) {
+    return checkPalindrome(s, 0, s.length() - 1);
+}
+
+private boolean checkPalindrome(String s, int left, int right) {
+    if (left >= right) return true;
     if (s.charAt(left) != s.charAt(right)) return false;
-    return isPalindrome(s, left + 1, right - 1);  // check the inside
+    return checkPalindrome(s, left + 1, right - 1);
 }
-// call it as: isPalindrome(s, 0, s.length() - 1);
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def is_palindrome(s, left, right):
-    if left >= right:
-        return True                               # base: pointers crossed
-    if s[left] != s[right]:
-        return False
-    return is_palindrome(s, left + 1, right - 1)  # check the inside
-# call it as: is_palindrome(s, 0, len(s) - 1)
+def is_palindrome(s):
+    def check_palindrome(left, right):
+        if left >= right:
+            return True
+        if s[left] != s[right]:
+            return False
+        return check_palindrome(left + 1, right - 1)
+        
+    return check_palindrome(0, len(s) - 1)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
-bool isPalindrome(string s, int left, int right) {
-    if (left >= right) return true;               // base: pointers crossed
+bool checkPalindrome(const string& s, int left, int right) {
+    if (left >= right) return true;
     if (s[left] != s[right]) return false;
-    return isPalindrome(s, left + 1, right - 1);  // check the inside
+    return checkPalindrome(s, left + 1, right - 1);
 }
-// call it as: isPalindrome(s, 0, s.size() - 1);
+
+bool isPalindrome(string s) {
+    return checkPalindrome(s, 0, s.size() - 1);
+}
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(n)
-
 ---
 
-## ✅ Solution 8 — Binary Search (recursive)
+### Solution 8: Binary Search (Recursive)
 
-> **Divide and conquer IS recursion.** Look at the middle. Too big? Recurse on the left half. Too small? Recurse on the right half. Base case: range is empty (`low > high`) → not found.
+**Complexity:**
+- **Time:** $O(\log n)$
+- **Space:** $O(\log n)$ stack frames.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public static int binarySearch(int[] arr, int low, int high, int target) {
-    if (low > high) return -1;                    // base: empty range
-    int mid = low + (high - low) / 2;
-    if (arr[mid] == target) return mid;
-    if (arr[mid] < target)
-        return binarySearch(arr, mid + 1, high, target);   // right half
-    else
-        return binarySearch(arr, low, mid - 1, target);    // left half
+public int search(int[] nums, int target) {
+    return binarySearch(nums, 0, nums.length - 1, target);
 }
-// call it as: binarySearch(arr, 0, arr.length - 1, target);
+
+private int binarySearch(int[] nums, int low, int high, int target) {
+    if (low > high) return -1;
+    int mid = low + (high - low) / 2;
+    if (nums[mid] == target) return mid;
+    if (nums[mid] < target) {
+        return binarySearch(nums, mid + 1, high, target);
+    } else {
+        return binarySearch(nums, low, mid - 1, target);
+    }
+}
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def binary_search(arr, low, high, target):
-    if low > high:
-        return -1                                 # base: empty range
-    mid = (low + high) // 2
-    if arr[mid] == target:
-        return mid
-    if arr[mid] < target:
-        return binary_search(arr, mid + 1, high, target)   # right half
-    else:
-        return binary_search(arr, low, mid - 1, target)    # left half
-# call it as: binary_search(arr, 0, len(arr) - 1, target)
+def search(nums, target):
+    def binary_search(low, high):
+        if low > high:
+            return -1
+        mid = low + (high - low) // 2
+        if nums[mid] == target:
+            return mid
+        if nums[mid] < target:
+            return binary_search(mid + 1, high)
+        else:
+            return binary_search(low, mid - 1)
+            
+    return binary_search(0, len(nums) - 1)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
-int binarySearch(int arr[], int low, int high, int target) {
-    if (low > high) return -1;                    // base: empty range
+int binarySearch(const vector<int>& nums, int low, int high, int target) {
+    if (low > high) return -1;
     int mid = low + (high - low) / 2;
-    if (arr[mid] == target) return mid;
-    if (arr[mid] < target)
-        return binarySearch(arr, mid + 1, high, target);   // right half
-    else
-        return binarySearch(arr, low, mid - 1, target);    // left half
+    if (nums[mid] == target) return mid;
+    if (nums[mid] < target) {
+        return binarySearch(nums, mid + 1, high, target);
+    } else {
+        return binarySearch(nums, low, mid - 1, target);
+    }
 }
-// call it as: binarySearch(arr, 0, n - 1, target);
+
+int search(vector<int>& nums, int target) {
+    return binarySearch(nums, 0, nums.size() - 1, target);
+}
 ```
 </details>
 
-> ⏱️ Time O(log n) · Space O(log n) — the stack is only as deep as the number of halvings.
+---
+
+## ⚠️ Beginner Pitfalls & Common Mistakes
+
+1. **Incorrect/Missing Base Case:**
+   - If the base case is missing or cannot be reached, the code loops forever until it throws a `StackOverflowError`. Always verify that every path moves closer to the base case.
+
+2. **Tail Recursion & Memory:**
+   - In some languages like C++, tail-call optimization can reuse stack frames for functions that return the result of their recursive call directly (e.g. Solution 8). However, Java and Python do not support this optimization natively. Recursion is always constrained by the stack depth limit (typically ~1000 in Python).
 
 ---
 
-## 📋 One-Glance Reference
-
-| Type | # calls | Time | Space | Examples |
-|------|---------|------|-------|----------|
-| **Linear (work down)** | 1, before call | O(n) | O(n) | printNto1 |
-| **Linear (work up / return)** | 1, after call | O(n) | O(n) | print1toN, factorial, sum, power |
-| **Tree (branching)** | 2+ | O(2ⁿ) | O(n) | fibonacci |
-| **Divide & conquer** | 1 of 2 halves | O(log n) | O(log n) | binary search |
-
----
-
-## ❓ Common Doubts (Quick Answers)
-
-- **What is StackOverflowError?** The call stack has a finite size. A missing/unreachable base case → infinite calls → stack fills up → crash. It's the computer saying "you never stopped."
-- **Why is recursion sometimes slower than a loop?** Function calls aren't free (each makes a stack frame), and tree recursion like `fib` redoes the same subproblems. A loop reuses one frame and never recomputes.
-- **When should I use recursion?** When the problem is naturally self-similar — trees, divide & conquer, backtracking. For a flat count up/down, a loop is usually cleaner.
-
----
-
-> 🌟 **You did it.** Recursion is the gateway to trees, backtracking, and dynamic programming — the "scary" topics that are just *recursion with a memory*. Get these 8 solid, dry-run them on paper, and you're ahead of most beginners. I'm right here for any doubt. 💪 — *Ajai Raj (Mentor)*
+> 👉 Next, open `07-Hashing.md` to learn how we index keys and values in constant time! 💪

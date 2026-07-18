@@ -1,457 +1,462 @@
 # 🗃️ 07 — Hashing (HashSet & HashMap)
 
-> 🏷️ **Explain Like I'm 5:** Imagine a coat-check counter. You hand over your coat, get a token, and later that token instantly finds your exact coat — no searching through every coat. A **hash** is that instant-lookup magic. Instead of scanning a whole array (slow), you ask "is it there?" and get an answer *immediately*.
-
-> 💛 This is one of the most-loved topics in interviews because it turns slow O(n²) solutions into fast O(n) ones. Go slow, and watch each problem become a small upgrade of the last.
-
----
-
-## The 2 Tools You'll Use Forever
-
-| Tool | Question it answers | Real use |
-|------|---------------------|----------|
-| **HashSet** | *"Have I seen this before?"* | Uniqueness — no duplicates allowed |
-| **HashMap** | *"What information is attached to this thing?"* | Mapping / counting — key → value |
-
-> 🧠 **The one-line difference to memorize:**
-> **HashSet → Uniqueness.** **HashMap → Mapping / Counting.**
-
-Both give you **O(1) average lookup** — that's the superpower.
+> **Explain Like I'm 5:** Imagine a coat-check counter. You hand over your coat, get a ticket, and later that ticket instantly locates your exact coat — without the clerk scanning through every single coat in the building. 
+> A **hash** is that instant-lookup ticket. Instead of scanning a whole array ($O(n)$ time), you ask "is it there?" and get an answer *instantly* ($O(1)$ time).
 
 ---
 
-## Quick Syntax Cheat-Sheet
+## ⚙️ Under the Hood: How Hashing Works
 
-| Action | ☕ Java | 🐍 Python | ⚡ C++ |
-|--------|--------|-----------|--------|
-| Make a set | `HashSet<Integer> s = new HashSet<>();` | `s = set()` | `unordered_set<int> s;` |
-| Seen it? | `s.contains(x)` | `x in s` | `s.count(x)` |
-| Add to set | `s.add(x)` | `s.add(x)` | `s.insert(x)` |
-| Make a map | `HashMap<Integer,Integer> m = new HashMap<>();` | `m = {}` | `unordered_map<int,int> m;` |
-| Has key? | `m.containsKey(k)` | `k in m` | `m.count(k)` |
-| Put / read | `m.put(k,v)` / `m.get(k)` | `m[k] = v` / `m[k]` | `m[k] = v` / `m[k]` |
+A HashTable (the engine behind HashMap and HashSet) maps keys to values using a combination of a **Hash Function** and a **Bucket Array**.
 
----
+### 1. The Hash Function
+A mathematical function that converts any key (like a string `"apple"` or integer `482`) into an integer index within the range of our bucket array:
 
-## The Learning Ladder (Why This Order)
+$$\text{Bucket Index} = \text{Hash}(Key) \pmod{\text{Bucket Size}}$$
 
-Each problem is a **direct upgrade** of the one before — not random:
+A good hash function distributes keys uniformly across the array to avoid clusters.
+
+### 2. Collisions & Collision Resolution
+Since there are infinite possible keys but a finite number of buckets, two different keys will eventually hash to the exact same index. This is a **Collision**.
+There are two primary ways to resolve collisions:
+
+#### Method A: Separate Chaining (Used by Java's HashMap)
+Each slot in the bucket array points to a linked list (or a balanced tree) of elements that hashed to that same index.
 
 ```
-HashSet  →  HashMap  →  Two Maps  →  Frequency Map  →  Frequency + Sorting
-   1          2            3              4                  5
+Bucket Array:
+┌───┐
+│ 0 │ ──► [ Key: "apple", Val: 10 ] ──► NULL
+├───┤
+│ 1 │ ──► NULL
+├───┤
+│ 2 │ ──► [ Key: "banana", Val: 3 ] ──► [ Key: "cherry", Val: 7 ] ──► NULL
+├───┤
+│ 3 │ ──► NULL
+└───┘
 ```
+
+#### Method B: Open Addressing (Linear Probing)
+If a slot is full, the computer searches sequentially for the next available empty slot in the array.
+
+### 3. Load Factor & Rehashing
+The **Load Factor ($\alpha$)** measures how full the HashTable is:
+
+$$\alpha = \frac{\text{Number of Stored Keys}}{\text{Total Bucket Size}}$$
+
+- When $\alpha$ exceeds a threshold (typically **`0.75`**), lookup performance begins to degrade because collision chains grow longer.
+- The table triggers **Rehashing**: it doubles the bucket array size, creates a new hash function modulo, and moves all elements to their new locations. This is an $O(n)$ operation but happens infrequently, maintaining an **amortized $O(1)$** insertion time.
 
 ---
 
-## Problem 1 — Contains Duplicate `(HashSet)`
+## 📊 HashSet vs. HashMap
 
-> **Question it teaches:** *"Have I seen this element before?"*
-> Walk the array. Before adding each number, check if it's already in the set. If yes → duplicate found.
+| Structure | Purpose | Internal Mechanism | Typical Question |
+| :--- | :--- | :--- | :--- |
+| **HashSet** | Stores unique keys. | A HashMap under the hood with a dummy value. | *"Have I seen this element before?"* |
+| **HashMap** | Maps unique keys to values. | A table of Key-Value pairs. | *"What information is associated with this key?"* |
+
+---
+
+## 🎯 Practice Problems & Worked Solutions
+
+Work through these problems in order to see how Hashing transforms nested loops into linear lookups.
+
+| # | Problem | Difficulty | Link | Key Idea |
+|---|---|---|---|---|
+| 1 | Contains Duplicate | Easy | [LeetCode](https://leetcode.com/problems/contains-duplicate/) | HashSet uniqueness check. |
+| 2 | Two Sum | Easy | [LeetCode](https://leetcode.com/problems/two-sum/) | Map target complements to indices. |
+| 3 | Isomorphic Strings | Easy | [LeetCode](https://leetcode.com/problems/isomorphic-strings/) | Two-way mapping check. |
+| 4 | Find Common Characters | Easy | [LeetCode](https://leetcode.com/problems/find-common-characters/) | Intersecting frequency counts. |
+| 5 | Sort Characters By Frequency | Medium | [LeetCode](https://leetcode.com/problems/sort-characters-by-frequency/) | Count frequencies, sort keys by value. |
+| 6 | Find The Difference | Easy | [LeetCode](https://leetcode.com/problems/find-the-difference/) | Balance counts or cancel out using XOR. |
+
+---
+
+### Solution 1: Contains Duplicate
+
+**Intuition:** 
+As we traverse the array, check if the current element is already in our `seen` set.
+- If it is, we found a duplicate -> return `true`.
+- Otherwise, add the element to the set and continue.
+
+**Complexity:**
+- **Time:** $O(n)$ — Single pass traversal.
+- **Space:** $O(n)$ — In the worst case, we store all $n$ unique elements in the set.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-static boolean containsDuplicate(int[] nums) {
-    HashSet<Integer> set = new HashSet<>();
+public boolean containsDuplicate(int[] nums) {
+    HashSet<Integer> seen = new HashSet<>();
     for (int num : nums) {
-        if (set.contains(num)) return true;   // seen before → duplicate!
-        set.add(num);                          // otherwise remember it
+        if (seen.contains(num)) {
+            return true; // Found duplicate
+        }
+        seen.add(num);
     }
     return false;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def containsDuplicate(nums):
+def contains_duplicate(nums):
     seen = set()
     for num in nums:
         if num in seen:
-            return True                        # seen before → duplicate!
-        seen.add(num)                          # otherwise remember it
+            return True # Found duplicate
+        seen.add(num)
     return False
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 bool containsDuplicate(vector<int>& nums) {
-    unordered_set<int> st;
+    unordered_set<int> seen;
     for (int num : nums) {
-        if (st.count(num)) return true;        // seen before → duplicate!
-        st.insert(num);                        // otherwise remember it
+        if (seen.count(num)) {
+            return true; // Found duplicate
+        }
+        seen.insert(num);
     }
     return false;
 }
 ```
 </details>
 
-> ⏱️ **Time:** O(n) · **Space:** O(n). Compare to checking every pair — that's O(n²). The set is the upgrade.
-
 ---
 
-## Problem 2 — Two Sum `(HashMap)` ⭐
+### Solution 2: Two Sum
 
-> **This is THE HashMap problem.** Ask yourself first: *why* do we need a map, not just a set?
-> Because we don't just want "have I seen it" — we want *"where did I see it"* (its index). That extra info = the **value** in the map.
+**Intuition:**
+For each number `nums[i]`, we need to find if its complement `target - nums[i]` exists in the array.
+Instead of checking every pair ($O(n^2)$), we store each visited number and its index in a HashMap. At each step, we look up if `target - nums[i]` is in the map. If it is, we return their indices.
 
-> **Trick:** For each number, the partner we need is `target - num`. If that partner is already in the map, we're done.
-
-```
-nums = [2, 7, 11, 15], target = 9
-At 2 → need 7 (not seen yet) → store 2
-At 7 → need 2 (seen at index 0!) → answer [0, 1]
-```
+**Complexity:**
+- **Time:** $O(n)$ — One-pass traversal.
+- **Space:** $O(n)$ — Store elements in the HashMap.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-static int[] twoSum(int[] nums, int target) {
-    HashMap<Integer, Integer> map = new HashMap<>();
+public int[] twoSum(int[] nums, int target) {
+    HashMap<Integer, Integer> map = new HashMap<>(); // Value -> Index
     for (int i = 0; i < nums.length; i++) {
-        int need = target - nums[i];           // the partner we're looking for
-        if (map.containsKey(need))
-            return new int[]{map.get(need), i};
-        map.put(nums[i], i);                   // store value → its index
+        int complement = target - nums[i];
+        if (map.containsKey(complement)) {
+            return new int[]{map.get(complement), i};
+        }
+        map.put(nums[i], i);
     }
     return new int[]{};
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def twoSum(nums, target):
-    mp = {}
+def two_sum(nums, target):
+    mp = {} # Value -> Index
     for i, num in enumerate(nums):
-        need = target - num                    # the partner we're looking for
-        if need in mp:
-            return [mp[need], i]
-        mp[num] = i                            # store value → its index
+        complement = target - num
+        if complement in mp:
+            return [mp[complement], i]
+        mp[num] = i
+    return []
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 vector<int> twoSum(vector<int>& nums, int target) {
-    unordered_map<int,int> mp;
+    unordered_map<int, int> mp; // Value -> Index
     for (int i = 0; i < nums.size(); i++) {
-        int need = target - nums[i];           // the partner we're looking for
-        if (mp.count(need))
-            return {mp[need], i};
-        mp[nums[i]] = i;                       // store value → its index
+        int complement = target - nums[i];
+        if (mp.count(complement)) {
+            return {mp[complement], i};
+        }
+        mp[nums[i]] = i;
     }
     return {};
 }
 ```
 </details>
 
-> ⏱️ **Time:** O(n) · **Space:** O(n)
-
 ---
 
-## Problem 3 — Isomorphic Strings `(Two HashMaps)`
+### Solution 3: Isomorphic Strings
 
-> **The upgrade:** one map is *not enough*. We must check the mapping **both ways**.
-> `s → t` AND `t → s`. If either direction breaks its earlier promise, it's not isomorphic.
+**Intuition:**
+A mapping must exist both ways. For example, if `s = "egg"` and `t = "add"`, then `'e'` maps to `'a'` and `'g'` maps to `'d'`. Additionally, `'a'` must map back to `'e'` and `'d'` back to `'g'`. We use two HashMaps to track these mappings.
 
-```
-egg → add
-e→a, g→d  ✅  (and a→e, d→g holds too)
-```
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$ (The character set is bounded by ASCII size, at most 256 keys).
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public boolean isIsomorphic(String s, String t) {
-    HashMap<Character, Character> st = new HashMap<>();
-    HashMap<Character, Character> ts = new HashMap<>();
+    HashMap<Character, Character> sToT = new HashMap<>();
+    HashMap<Character, Character> tToS = new HashMap<>();
+    
     for (int i = 0; i < s.length(); i++) {
-        char a = s.charAt(i), b = t.charAt(i);
-        if (st.containsKey(a) && st.get(a) != b) return false;  // s→t broken
-        if (ts.containsKey(b) && ts.get(b) != a) return false;  // t→s broken
-        st.put(a, b);
-        ts.put(b, a);
+        char a = s.charAt(i);
+        char b = t.charAt(i);
+        
+        if (sToT.containsKey(a) && sToT.get(a) != b) return false;
+        if (tToS.containsKey(b) && tToS.get(b) != a) return false;
+        
+        sToT.put(a, b);
+        tToS.put(b, a);
     }
     return true;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def isIsomorphic(s, t):
-    st, ts = {}, {}
+def is_isomorphic(s, t):
+    s_to_t, t_to_s = {}, {}
     for a, b in zip(s, t):
-        if a in st and st[a] != b:
-            return False                       # s→t broken
-        if b in ts and ts[b] != a:
-            return False                       # t→s broken
-        st[a] = b
-        ts[b] = a
+        if a in s_to_t and s_to_t[a] != b:
+            return False
+        if b in t_to_s and t_to_s[b] != a:
+            return False
+        s_to_t[a] = b
+        t_to_s[b] = a
     return True
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 bool isIsomorphic(string s, string t) {
-    unordered_map<char,char> st, ts;
+    unordered_map<char, char> sToT, tToS;
     for (int i = 0; i < s.size(); i++) {
         char a = s[i], b = t[i];
-        if (st.count(a) && st[a] != b) return false;  // s→t broken
-        if (ts.count(b) && ts[b] != a) return false;  // t→s broken
-        st[a] = b;
-        ts[b] = a;
+        if (sToT.count(a) && sToT[a] != b) return false;
+        if (tToS.count(b) && tToS[b] != a) return false;
+        sToT[a] = b;
+        tToS[b] = a;
     }
     return true;
 }
 ```
 </details>
-
-> ⏱️ **Time:** O(n) · **Space:** O(1) (at most 256 characters tracked)
 
 ---
 
-## Problem 4 — Find Common Characters `(Frequency Counting)`
+### Solution 4: Find Common Characters
 
-> **The upgrade:** now we *count* letters in each word, and keep the **minimum** count across all words. A letter that appears in every word — at least this many times — is common to all.
+**Intuition:**
+For each string, calculate the frequency count of each character. Keep a global minimum frequency list `minFreq` of size 26. For each letter, update `minFreq[c] = min(minFreq[c], currentWordFreq[c])`.
 
-```
-bella → l:2, e:1, ...
-label → l:2, e:1, ...
-roller → l:2, e:1, ...
-common: e (min 1), l (min 2)  →  ["e", "l", "l"]
-```
+**Complexity:**
+- **Time:** $O(n \times L)$ where $n$ is the number of words, and $L$ is the average word length.
+- **Space:** $O(1)$ auxiliary space (frequency arrays are fixed at size 26).
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public List<String> commonChars(String[] words) {
     int[] minFreq = new int[26];
     Arrays.fill(minFreq, Integer.MAX_VALUE);
-    for (String word : words) {
+    
+    for (String w : words) {
         int[] freq = new int[26];
-        for (char c : word.toCharArray()) freq[c - 'a']++;
-        for (int i = 0; i < 26; i++)
-            minFreq[i] = Math.min(minFreq[i], freq[i]);   // keep the minimum
+        for (char c : w.toCharArray()) {
+            freq[c - 'a']++;
+        }
+        for (int i = 0; i < 26; i++) {
+            minFreq[i] = Math.min(minFreq[i], freq[i]);
+        }
     }
+    
     List<String> result = new ArrayList<>();
-    for (int i = 0; i < 26; i++)
-        while (minFreq[i]-- > 0)
+    for (int i = 0; i < 26; i++) {
+        while (minFreq[i] > 0) {
             result.add(String.valueOf((char) ('a' + i)));
+            minFreq[i]--;
+        }
+    }
+    return result;
+}
+```
+
+#### Python
+```python
+from collections import Counter
+
+def common_chars(words):
+    # Intersect frequencies using Counter & intersection
+    common = Counter(words[0])
+    for w in words[1:]:
+        common &= Counter(w)
+    return list(common.elements())
+```
+
+#### C++
+```cpp
+vector<string> commonChars(vector<string>& words) {
+    vector<int> minFreq(26, INT_MAX);
+    for (string& w : words) {
+        vector<int> freq(26, 0);
+        for (char c : w) {
+            freq[c - 'a']++;
+        }
+        for (int i = 0; i < 26; i++) {
+            minFreq[i] = min(minFreq[i], freq[i]);
+        }
+    }
+    vector<string> result;
+    for (int i = 0; i < 26; i++) {
+        while (minFreq[i] > 0) {
+            result.push_back(string(1, 'a' + i));
+            minFreq[i]--;
+        }
+    }
     return result;
 }
 ```
 </details>
 
-<details>
-<summary>🐍 Python</summary>
-
-```python
-from collections import Counter
-
-def commonChars(words):
-    common = Counter(words[0])
-    for word in words[1:]:
-        common &= Counter(word)                # & keeps the minimum of each
-    return list(common.elements())
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-vector<string> commonChars(vector<string>& words) {
-    vector<int> mn(26, INT_MAX);
-    for (string& w : words) {
-        vector<int> cnt(26, 0);
-        for (char c : w) cnt[c - 'a']++;
-        for (int i = 0; i < 26; i++)
-            mn[i] = min(mn[i], cnt[i]);         // keep the minimum
-    }
-    vector<string> ans;
-    for (int i = 0; i < 26; i++)
-        while (mn[i]-- > 0)
-            ans.push_back(string(1, 'a' + i));
-    return ans;
-}
-```
-</details>
-
-> ⏱️ **Time:** O(n · L) (words × word length) · **Space:** O(1) (26 boxes)
-
 ---
 
-## Problem 5 — Sort Characters By Frequency `(HashMap + Sorting)`
+### Solution 5: Sort Characters By Frequency
 
-> **The final upgrade:** count with a map, *then* **sort** by that count. Highest frequency letters come first, repeated their count many times.
+**Intuition:**
+Use a HashMap to build character frequency counts. Then, sort the character keys based on their values (frequencies) in descending order. Construct the result string by appending each character repeated by its count.
 
-```
-"tree" → e:2, r:1, t:1  →  "eert" (or "eetr")
-```
+**Complexity:**
+- **Time:** $O(n + k \log k)$ where $n$ is string length, and $k$ is unique characters count ($k \le 256$, so essentially $O(n)$).
+- **Space:** $O(n)$ (for storing frequencies and building the string).
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public String frequencySort(String s) {
-    Map<Character, Integer> counts = new HashMap<>();
-    for (char ch : s.toCharArray())
-        counts.put(ch, counts.getOrDefault(ch, 0) + 1);
+    HashMap<Character, Integer> counts = new HashMap<>();
+    for (char c : s.toCharArray()) {
+        counts.put(c, counts.getOrDefault(c, 0) + 1);
+    }
+    
+    // Sort keys based on count value
     List<Character> chars = new ArrayList<>(counts.keySet());
-    chars.sort((a, b) -> counts.get(b) - counts.get(a));   // high → low
+    chars.sort((a, b) -> counts.get(b) - counts.get(a));
+    
     StringBuilder sb = new StringBuilder();
     for (char c : chars) {
-        int n = counts.get(c);
-        while (n-- > 0) sb.append(c);
+        int count = counts.get(c);
+        for (int i = 0; i < count; i++) {
+            sb.append(c);
+        }
     }
     return sb.toString();
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 from collections import Counter
 
-def frequencySort(s):
+def frequency_sort(s):
     freq = Counter(s)
-    return ''.join(c * n for c, n in freq.most_common())   # most_common sorts for us
+    # most_common() returns list of (element, count) sorted by count descending
+    return "".join(c * count for c, count in freq.most_common())
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 string frequencySort(string s) {
-    unordered_map<char,int> freq;
+    unordered_map<char, int> freq;
     for (char c : s) freq[c]++;
-    vector<pair<int,char>> arr;
-    for (auto p : freq) arr.push_back({p.second, p.first});
-    sort(arr.rbegin(), arr.rend());            // sort by count, high → low
-    string ans;
-    for (auto p : arr) ans += string(p.first, p.second);
-    return ans;
+    
+    vector<pair<int, char>> arr;
+    for (auto p : freq) {
+        arr.push_back({p.second, p.first});
+    }
+    // Sort in descending order
+    sort(arr.rbegin(), arr.rend());
+    
+    string result = "";
+    for (auto p : arr) {
+        result += string(p.first, p.second);
+    }
+    return result;
 }
 ```
 </details>
 
-> ⏱️ **Time:** O(n + k log k) · **Space:** O(n)
-
 ---
 
-## 🧠 5-Minute Revision (The Board Summary)
+### Solution 6: Find The Difference
 
-```
-HASHSET  →  "Have I seen this before?"  →  Uniqueness
-   └─ Contains Duplicate
+**Intuition:**
+1. **Counting method:** Count frequencies in `t`, subtract using characters in `s`. The character left with count $> 0$ is the extra character.
+2. **XOR method:** Since $X \oplus X = 0$, XORing all characters from both strings will cancel out duplicate characters, leaving only the extra one.
 
-HASHMAP  →  "What info is attached to this?"  →  Mapping / Counting
-   ├─ Two Sum          (value → index)
-   ├─ Isomorphic       (char → char, both ways)
-   ├─ Common Chars     (char → frequency)
-   └─ Frequency Sort   (char → frequency, then sort)
-```
-
-> If you can explain this box out loud, you understand hashing. That's the whole topic in one picture. 🎯
-
----
-
-# 🎯 Practice / Homework
-
-| # | Problem | Difficulty | Practice Link |
-|---|---------|-----------|---------------|
-| 1 | Find The Difference | Easy | https://leetcode.com/problems/find-the-difference/ |
-| 2 | Valid Anagram *(revision)* | Easy | https://leetcode.com/problems/valid-anagram/ |
-| 3 | First Unique Character *(revision)* | Easy | https://leetcode.com/problems/first-unique-character-in-a-string/ |
-| 4 | Isomorphic Strings *(re-solve)* | Medium | https://leetcode.com/problems/isomorphic-strings/ |
-| 5 | Find Common Characters *(re-solve)* | Medium | https://leetcode.com/problems/find-common-characters/ |
-| 6 | Sort Characters By Frequency *(re-solve)* | Medium | https://leetcode.com/problems/sort-characters-by-frequency/ |
-
-> 💡 Problems 2 & 3 also live in your **Strings** notes (`05-Strings.md`) — notice they're the *same* frequency-array idea. That repetition is exactly how it locks in. 🙌
-
----
-
-## ✅ Worked Solution — Find The Difference
-
-> **Problem:** String `t` is `s` shuffled, plus **one extra letter**. Find that letter.
-> **Weapon used:** frequency counting — count up for `t`, count down for `s`, the leftover letter is the answer. (A neat XOR trick also exists — shown after.)
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java (XOR Version)
 ```java
-char findTheDifference(String s, String t) {
-    int[] count = new int[26];
-    for (char c : t.toCharArray()) count[c - 'a']++;   // add all of t
-    for (char c : s.toCharArray()) count[c - 'a']--;   // remove all of s
-    for (int i = 0; i < 26; i++)
-        if (count[i] > 0) return (char) ('a' + i);     // the leftover
-    return ' ';
+public char findTheDifference(String s, String t) {
+    char extra = 0;
+    for (int i = 0; i < s.length(); i++) {
+        extra ^= s.charAt(i);
+    }
+    for (int i = 0; i < t.length(); i++) {
+        extra ^= t.charAt(i);
+    }
+    return extra;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python (XOR Version)
 ```python
-def findTheDifference(s, t):
-    count = [0] * 26
-    for c in t:
-        count[ord(c) - ord('a')] += 1          # add all of t
-    for c in s:
-        count[ord(c) - ord('a')] -= 1          # remove all of s
-    for i in range(26):
-        if count[i] > 0:
-            return chr(ord('a') + i)           # the leftover
+def find_the_difference(s, t):
+    extra = 0
+    for ch in s:
+        extra ^= ord(ch)
+    for ch in t:
+        extra ^= ord(ch)
+    return chr(extra)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++ (XOR Version)
 ```cpp
 char findTheDifference(string s, string t) {
-    int count[26] = {0};
-    for (char c : t) count[c - 'a']++;         // add all of t
-    for (char c : s) count[c - 'a']--;         // remove all of s
-    for (int i = 0; i < 26; i++)
-        if (count[i] > 0) return 'a' + i;      // the leftover
-    return ' ';
+    char extra = 0;
+    for (char c : s) extra ^= c;
+    for (char c : t) extra ^= c;
+    return extra;
 }
 ```
 </details>
 
-> ⏱️ **Time:** O(n) · **Space:** O(1)
+---
 
-> 🪄 **Bonus (XOR trick):** XOR every character of both strings together. Identical letters cancel out, leaving only the extra one. `char ^= c` over all chars of `s` and `t`. Clever, but the counting version above is easier to explain in an interview.
+## ⚠️ Beginner Pitfalls & Common Mistakes
 
-> Problems 2 (Valid Anagram) and 3 (First Unique Character) are already fully solved in your **Strings** notes — flip back to `05-Strings.md` for those. 🌟
+1. **Worst Case Performance:**
+   - In rare situations where your hash function distributes all keys to the same bucket index, a HashMap's lookup degrades from $O(1)$ to $O(n)$. Java 8 resolves this by converting collision linked lists into Red-Black trees when a list's length exceeds 8, keeping worst-case lookup at $O(\log n)$.
+
+2. **Modifying Keys While inside the Map:**
+   - Never modify an object after using it as a key in a HashMap. Doing so changes the object's hash code, making it impossible for the HashMap to locate it again, resulting in memory leaks and bugs.
 
 ---
 
-> 🎉 **You've unlocked hashing** — the tool that quietly powers half of all interview solutions. Every time you catch yourself writing a nested loop, pause and ask: *"could a HashSet or HashMap make this one pass?"* That instinct is what separates a beginner from someone interview-ready. I'm right here for any doubt. 💪 — *Ajai Raj (Mentor)*
+> 👉 Next, open `08-Prefix-Sum.md` to learn how precomputations unlock range query optimization! 💪

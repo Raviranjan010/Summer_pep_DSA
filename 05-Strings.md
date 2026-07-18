@@ -1,255 +1,206 @@
 # 🔤 05 — Strings
 
-> 🪄 **The one mantra for all of strings:**
-> **"A String is just an array of characters."**
-> Everything you learned about arrays — two pointers, counting — works here. You already know strings. You just don't know it yet.
+> **The primary principle:** A string is simply an array of characters. Almost all array algorithms (Two Pointers, Hashing, Counting) can be applied directly to strings!
 
 ---
 
-## The 2 Weapons That Solve Almost Every String Problem
+## ⚔️ Mutability vs. Immutability: Language Design Differences
 
-1. **Two pointers** → reverse, palindrome
-2. **A frequency/count array `int[26]`** → anagram, unique character
+How strings are handled in memory differs significantly between languages. Knowing these details is critical for passing coding interviews.
+
+### 1. Java & Python (Immutable Strings)
+- In Java and Python, string objects are **read-only** (immutable). Once created, their characters cannot be modified in-place.
+- **The Loop Concatenation Trap:**
+  Doing `s += char` inside a loop of size $n$ takes $O(n^2)$ time!
+  ```python
+  # TRAP: O(n^2) time complexity
+  s = ""
+  for char in list_of_chars:
+      s += char # Creates a BRAND NEW string copy each time
+  ```
+  At each step, the computer copies the existing characters to a new memory block. Total operations: $1 + 2 + 3 + \dots + n = \frac{n(n+1)}{2} = O(n^2)$.
+- **The Solution:**
+  - In **Java**, use **`StringBuilder`**, which behaves like a mutable dynamic array of characters.
+  - In **Python**, append characters to a list `[]`, and join them at the end using `''.join(list)`.
+
+### 2. C++ (Mutable Strings)
+- In C++, `std::string` is **mutable** (modifiable).
+- It is allocated on the heap as a dynamic array of characters, allowing you to modify individual characters in-place (`s[i] = 'x'`) and append elements in amortized $O(1)$ time.
 
 ---
 
-## The Magic `c - 'a'` Trick (Spend Real Time Here)
+## 🧮 The Character Arithmetic Trick: `c - 'a'`
 
-> 🔑 Letters have secret numbers (ASCII): `'a'` = 97, `'b'` = 98, ... `'z'` = 122.
-> So:
-> - `'a' - 'a'` = 0
-> - `'b' - 'a'` = 1
-> - `'z' - 'a'` = 25
->
-> `c - 'a'` turns any lowercase letter into a number **0–25**. That lets a 26-box array act as a "letter counter." **Half of string problems depend on this one line.**
+Computers do not store letters; they store numbers (ASCII codes).
+- `'a'` is represented as `97`
+- `'b'` is represented as `98`
+- ...
+- `'z'` is represented as `122`
+
+Subtracting the base character `'a'` from any lowercase character maps it directly to a relative index from `0` to `25`:
+
+$$\text{Index} = \text{ASCII}(c) - \text{ASCII}('a')$$
+
+```
+c = 'a'  ==>  97 - 97 = 0
+c = 'b'  ==>  98 - 97 = 1
+c = 'z'  ==>  122 - 97 = 25
+```
+
+This maps letters directly to index positions in a fixed-size `26`-element frequency counting array:
+
+```
+Index:         0     1     2     3     ...     25
+Character:    'a'   'b'   'c'   'd'    ...    'z'
+           ┌─────┬─────┬─────┬─────┬─────────┬─────┐
+Freq Array:│  2  │  0  │  1  │  0  │   ...   │  1  │
+           └─────┴─────┴─────┴─────┴─────────┴─────┘
+```
 
 ---
 
-## Problem 1 — Check Palindrome (two pointers)
+## 🎯 Practice Problems & Worked Solutions
 
-> A palindrome reads the same both ways: `madam`, `racecar`.
+Verify your solutions for these 5 core string problems.
+
+| # | Problem | Difficulty | Link | Key Idea |
+|---|---|---|---|---|
+| 1 | Valid Palindrome | Easy | [LeetCode](https://leetcode.com/problems/valid-palindrome/) | Two pointers skipping non-alphanumeric chars. |
+| 2 | Valid Anagram | Easy | [LeetCode](https://leetcode.com/problems/valid-anagram/) | Frequency array subtraction check. |
+| 3 | First Unique Character | Easy | [LeetCode](https://leetcode.com/problems/first-unique-character-in-a-string/) | Two-pass frequency check. |
+| 4 | Reverse String | Easy | [LeetCode](https://leetcode.com/problems/reverse-string/) | Swap elements in-place. |
+| 5 | Reverse Words in a String | Medium | [LeetCode](https://leetcode.com/problems/reverse-words-in-a-string/) | Split on whitespace, reverse words list. |
+
+---
+
+### Solution 1: Valid Palindrome
+
+**Intuition:** 
+Use the opposite-ends two-pointer template. 
+- Skip characters that are not letters or numbers (`isalnum`).
+- Convert characters to lowercase before comparing to make the check case-insensitive.
+
+**Complexity:**
+- **Time:** $O(n)$ — Single pass traversal of the string.
+- **Space:** $O(1)$ — Done in-place without creating a new string.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-boolean isPalindrome(String s) {
-    int left = 0, right = s.length() - 1;
+public boolean isPalindrome(String s) {
+    int left = 0;
+    int right = s.length() - 1;
     while (left < right) {
-        if (s.charAt(left) != s.charAt(right)) return false;
-        left++;
-        right--;
-    }
-    return true;
-}
-```
-</details>
-
-<details>
-<summary>🐍 Python</summary>
-
-```python
-def is_palindrome(s):
-    left, right = 0, len(s) - 1
-    while left < right:
-        if s[left] != s[right]:
-            return False
-        left += 1
-        right -= 1
-    return True
-    # Shortcut (learn the long way first): return s == s[::-1]
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-bool isPalindrome(string s) {
-    int left = 0, right = s.size() - 1;
-    while (left < right) {
-        if (s[left] != s[right]) return false;
-        left++;
-        right--;
-    }
-    return true;
-}
-```
-</details>
-
----
-
-## Problem 2 — Check Anagram (frequency array)
-
-> Two words are anagrams if they use the **same letters**: `listen` & `silent`.
-> **Trick:** Count letters in word A, subtract for word B. If all counts end at 0 → they match.
-
-<details>
-<summary>☕ Java</summary>
-
-```java
-boolean isAnagram(String a, String b) {
-    if (a.length() != b.length()) return false;
-    int[] count = new int[26];                  // 26 boxes, one per letter
-    for (int i = 0; i < a.length(); i++) {
-        count[a.charAt(i) - 'a']++;             // add for word a
-        count[b.charAt(i) - 'a']--;             // subtract for word b
-    }
-    for (int c : count) if (c != 0) return false;
-    return true;
-}
-```
-</details>
-
-<details>
-<summary>🐍 Python</summary>
-
-```python
-def is_anagram(a, b):
-    if len(a) != len(b):
-        return False
-    count = [0] * 26                            # 26 boxes, one per letter
-    for i in range(len(a)):
-        count[ord(a[i]) - ord('a')] += 1        # add for word a
-        count[ord(b[i]) - ord('a')] -= 1        # subtract for word b
-    return all(c == 0 for c in count)
-    # Shortcut: from collections import Counter; return Counter(a) == Counter(b)
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-bool isAnagram(string a, string b) {
-    if (a.size() != b.size()) return false;
-    int count[26] = {0};                        // 26 boxes, one per letter
-    for (int i = 0; i < a.size(); i++) {
-        count[a[i] - 'a']++;                    // add for word a
-        count[b[i] - 'a']--;                    // subtract for word b
-    }
-    for (int c : count) if (c != 0) return false;
-    return true;
-}
-```
-</details>
-
----
-
-## ⚠️ Java Gotcha (Drill Once)
-
-> In Java, `String` is **immutable** — it can't be changed after creation.
-> Doing `s = s + c` inside a loop is secretly **O(n²)** (slow!).
-> Use a **`char[]`** or **`StringBuilder`** instead when building strings in a loop.
-
----
-
-## 🎯 Practice (Easy First)
-
-| Problem | Where | Link |
-|---------|-------|------|
-| Valid Palindrome | LeetCode | https://leetcode.com/problems/valid-palindrome/ |
-| Valid Anagram | LeetCode | https://leetcode.com/problems/valid-anagram/ |
-| First Unique Character in a String | LeetCode | https://leetcode.com/problems/first-unique-character-in-a-string/ |
-| Reverse String | LeetCode | https://leetcode.com/problems/reverse-string/ |
-| Reverse Words in a String | LeetCode | https://leetcode.com/problems/reverse-words-in-a-string/ |
-
-> 💡 **Order to attack:** Reverse String → Valid Palindrome → Valid Anagram. Each one reuses the *exact* two weapons above. Notice the pattern repeating — that's the moment strings stop feeling scary. 🌟
-
----
-
-# ✅ Worked Solutions
-
-> Try each yourself first, then check. All three languages for every problem.
-
-## Solution 1 — Valid Palindrome
-
-> **Problem:** Check if a string is a palindrome, considering only letters & numbers, ignoring case.
-> **Weapon used:** two pointers walking inward.
-
-<details>
-<summary>☕ Java</summary>
-
-```java
-boolean isPalindrome(String s) {
-    int left = 0, right = s.length() - 1;
-    while (left < right) {
-        while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;
-        while (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;
-        if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right)))
+        // Skip non-alphanumeric characters from left
+        while (left < right && !Character.isLetterOrDigit(s.charAt(left))) {
+            left++;
+        }
+        // Skip non-alphanumeric characters from right
+        while (left < right && !Character.isLetterOrDigit(s.charAt(right))) {
+            right--;
+        }
+        
+        // Compare lowercase characters
+        if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
             return false;
-        left++; right--;
+        }
+        left++;
+        right--;
     }
     return true;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def is_palindrome(s):
     left, right = 0, len(s) - 1
     while left < right:
+        # Skip non-alphanumeric characters
         while left < right and not s[left].isalnum():
             left += 1
         while left < right and not s[right].isalnum():
             right -= 1
+            
         if s[left].lower() != s[right].lower():
             return False
         left += 1
         right -= 1
     return True
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 bool isPalindrome(string s) {
-    int left = 0, right = s.size() - 1;
+    int left = 0;
+    int right = s.size() - 1;
     while (left < right) {
-        while (left < right && !isalnum(s[left])) left++;
-        while (left < right && !isalnum(s[right])) right--;
-        if (tolower(s[left]) != tolower(s[right])) return false;
-        left++; right--;
+        while (left < right && !isalnum(s[left])) {
+            left++;
+        }
+        while (left < right && !isalnum(s[right])) {
+            right--;
+        }
+        if (tolower(s[left]) != tolower(s[right])) {
+            return false;
+        }
+        left++;
+        right--;
     }
     return true;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `s = "A man, a plan, a canal: Panama"`
+
+- `left` skips non-alphanumeric spaces/punctuation.
+- Pointers check:
+  - `s[left] = 'A'` vs `s[right] = 'a'` -> Match!
+  - `s[left] = 'm'` vs `s[right] = 'm'` -> Match!
+  - `s[left] = 'a'` vs `s[right] = 'a'` -> Match!
+  - `s[left] = 'n'` vs `s[right] = 'n'` -> Match!
+- Pointers eventually meet at center `'e'` (in "canal") without mismatch.
+
+**Result:** `True` ✅
+</details>
 
 ---
 
-## Solution 2 — Valid Anagram
+### Solution 2: Valid Anagram
 
-> **Problem:** Do two strings use the exact same letters?
-> **Weapon used:** the frequency array `int[26]`. Count up for A, count down for B; all zero → anagram.
+**Intuition:** 
+If lengths differ, they cannot be anagrams. Create a `26`-size integer array. For each character at index `i`, increment the count for `s[i]` and decrement for `t[i]`. If all elements in the count array are 0 at the end, they contain the same characters.
+
+**Complexity:**
+- **Time:** $O(n)$ — Single pass over both strings.
+- **Space:** $O(1)$ — The frequency array size is always 26, which is constant.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-boolean isAnagram(String s, String t) {
+public boolean isAnagram(String s, String t) {
     if (s.length() != t.length()) return false;
     int[] count = new int[26];
     for (int i = 0; i < s.length(); i++) {
-        count[s.charAt(i) - 'a']++;
-        count[t.charAt(i) - 'a']--;
+        count[s.charAt(i) - 'a']++; // Increment for s
+        count[t.charAt(i) - 'a']--; // Decrement for t
     }
-    for (int c : count) if (c != 0) return false;
+    for (int val : count) {
+        if (val != 0) return false;
+    }
     return true;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def is_anagram(s, t):
     if len(s) != len(t):
@@ -258,13 +209,10 @@ def is_anagram(s, t):
     for i in range(len(s)):
         count[ord(s[i]) - ord('a')] += 1
         count[ord(t[i]) - ord('a')] -= 1
-    return all(c == 0 for c in count)
+    return all(val == 0 for val in count)
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 bool isAnagram(string s, string t) {
     if (s.size() != t.size()) return false;
@@ -273,205 +221,203 @@ bool isAnagram(string s, string t) {
         count[s[i] - 'a']++;
         count[t[i] - 'a']--;
     }
-    for (int c : count) if (c != 0) return false;
+    for (int val : count) {
+        if (val != 0) return false;
+    }
     return true;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
-
 ---
 
-## Solution 3 — First Unique Character in a String
+### Solution 3: First Unique Character in a String
 
-> **Problem:** Return the **index** of the first non-repeating character. If none, return `-1`.
-> **Weapon used:** the frequency array `int[26]` + the `c - 'a'` trick.
+**Intuition:**
+Use a two-pass approach:
+1. Pass 1: Count occurrences of all characters and store them in our `26`-size count array.
+2. Pass 2: Iterate through the string sequentially. The first character whose frequency count is `1` is the first unique character. Return its index.
 
-**The plan (2 passes):**
-1. Walk the string once and **count** every character.
-2. Walk it again and return the **first index** whose count is exactly 1.
+**Complexity:**
+- **Time:** $O(n)$ — Two passes of size $n$.
+- **Space:** $O(1)$ — fixed frequency array.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-class Solution {
-    public int firstUniqChar(String s) {
-        int[] freq = new int[26];
-        for (int i = 0; i < s.length(); i++) {
-            freq[s.charAt(i) - 'a']++;          // pass 1: count
-        }
-        for (int i = 0; i < s.length(); i++) {
-            if (freq[s.charAt(i) - 'a'] == 1) {  // pass 2: first count of 1
-                return i;
-            }
-        }
-        return -1;                               // no unique char
+public int firstUniqChar(String s) {
+    int[] freq = new int[26];
+    // Pass 1: Count frequencies
+    for (int i = 0; i < s.length(); i++) {
+        freq[s.charAt(i) - 'a']++;
     }
+    // Pass 2: Find first character with count == 1
+    for (int i = 0; i < s.length(); i++) {
+        if (freq[s.charAt(i) - 'a'] == 1) {
+            return i;
+        }
+    }
+    return -1;
+}
+```
+
+#### Python
+```python
+def first_uniq_char(s):
+    freq = [0] * 26
+    # Pass 1: Count frequencies
+    for ch in s:
+        freq[ord(ch) - ord('a')] += 1
+    # Pass 2: Find index
+    for i in range(len(s)):
+        if freq[ord(s[i]) - ord('a')] == 1:
+            return i
+    return -1
+```
+
+#### C++
+```cpp
+int firstUniqChar(string s) {
+    int freq[26] = {0};
+    // Pass 1: Count frequencies
+    for (char ch : s) {
+        freq[ch - 'a']++;
+    }
+    // Pass 2: Find index
+    for (int i = 0; i < s.size(); i++) {
+        if (freq[s[i] - 'a'] == 1) {
+            return i;
+        }
+    }
+    return -1;
 }
 ```
 </details>
 
-<details>
-<summary>🐍 Python</summary>
-
-```python
-class Solution:
-    def firstUniqChar(self, s):
-        freq = [0] * 26
-        for ch in s:
-            freq[ord(ch) - ord('a')] += 1        # pass 1: count
-        for i in range(len(s)):
-            if freq[ord(s[i]) - ord('a')] == 1:  # pass 2: first count of 1
-                return i
-        return -1                                # no unique char
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-class Solution {
-public:
-    int firstUniqChar(string s) {
-        int freq[26] = {0};
-        for (char ch : s) {
-            freq[ch - 'a']++;                    // pass 1: count
-        }
-        for (int i = 0; i < s.size(); i++) {
-            if (freq[s[i] - 'a'] == 1) {         // pass 2: first count of 1
-                return i;
-            }
-        }
-        return -1;                               // no unique char
-    }
-};
-```
-</details>
-
-> ⏱️ **Time:** O(n) · **Space:** O(1) (the array is always 26 boxes, no matter how long the string is)
-
-**Dry run — `"leetcode"`:**
-
-| Char | Count |
-|------|-------|
-| l | 1 |
-| e | 3 |
-| t | 1 |
-| c | 1 |
-| o | 1 |
-| d | 1 |
-
-Pass 2: index 0 is `l`, count = 1 → **return 0** ✅
-
-> 🧠 **Pattern learned:** Frequency Array + Character Counting + String Traversal. This same 2-pass shape solves a huge family of string problems.
-
 ---
 
-## Solution 4 — Reverse String (array of chars)
+### Solution 4: Reverse String (Array of Characters)
 
-> **Problem:** Reverse a list of characters in place, O(1) extra memory.
-> **Weapon used:** two pointers swapping the two ends.
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-void reverseString(char[] s) {
-    int left = 0, right = s.length - 1;
+public void reverseString(char[] s) {
+    int left = 0;
+    int right = s.length - 1;
     while (left < right) {
         char temp = s[left];
         s[left] = s[right];
         s[right] = temp;
-        left++; right--;
+        left++;
+        right--;
     }
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def reverse_string(s):          # s is a list of chars
+def reverse_string(s):
     left, right = 0, len(s) - 1
     while left < right:
         s[left], s[right] = s[right], s[left]
         left += 1
         right -= 1
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 void reverseString(vector<char>& s) {
-    int left = 0, right = s.size() - 1;
+    int left = 0;
+    int right = s.size() - 1;
     while (left < right) {
         swap(s[left], s[right]);
-        left++; right--;
+        left++;
+        right--;
     }
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
-
 ---
 
-## Solution 5 — Reverse Words in a String
+### Solution 5: Reverse Words in a String
 
-> **Problem:** `"the sky is blue"` → `"blue is sky the"`. Trim extra spaces too.
-> **Weapon used:** split into words, reverse the order, join back. (Start with this clean version; the in-place trick comes later.)
+**Intuition:** 
+Split the string into individual words by checking for spaces. Reverse the order of the words list, and concatenate them back together separated by a single space.
+
+**Complexity:**
+- **Time:** $O(n)$ — Splitting and joining takes linear time.
+- **Space:** $O(n)$ — To store the split list of words.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-String reverseWords(String s) {
-    String[] words = s.trim().split("\\s+");   // split on one-or-more spaces
+public String reverseWords(String s) {
+    // Split using a regex that matches one or more spaces
+    String[] words = s.trim().split("\\s+");
     StringBuilder sb = new StringBuilder();
+    // Append words in reverse order
     for (int i = words.length - 1; i >= 0; i--) {
         sb.append(words[i]);
-        if (i > 0) sb.append(" ");
+        if (i > 0) {
+            sb.append(" ");
+        }
     }
     return sb.toString();
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def reverse_words(s):
-    words = s.split()           # split() handles extra spaces automatically
+    # s.split() automatically handles multiple spaces and trims
+    words = s.split()
+    # Reverse and join back with space
     return " ".join(reversed(words))
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 string reverseWords(string s) {
     stringstream ss(s);
     string word;
     vector<string> words;
-    while (ss >> word) words.push_back(word);   // >> skips extra spaces
-    string result;
+    // stringstream >> skips whitespace automatically
+    while (ss >> word) {
+        words.push_back(word);
+    }
+    string result = "";
     for (int i = words.size() - 1; i >= 0; i--) {
         result += words[i];
-        if (i > 0) result += " ";
+        if (i > 0) {
+            result += " ";
+        }
     }
     return result;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(n)
+---
 
-> 🧠 **Pattern learned:** strings are just arrays of characters — two pointers and a count array handle almost everything. You've now seen both weapons used across all 5 problems. 🌟
+## ⚠️ Beginner Pitfalls & Common Mistakes
+
+1. **Comparing Strings with `==` in Java:**
+   - In Java, doing `str1 == str2` compares the memory addresses of the objects, not their characters. Always use `.equals()`: `if (str1.equals(str2))`. (In C++ and Python, `==` behaves as expected, comparing contents).
+
+2. **Index out of bounds on `c - 'a'`:**
+   - Make sure your input only contains lowercase alphabetic characters when doing `c - 'a'`. If the string can contain uppercase letters or symbols, this calculation will result in negative indices or indices $> 25$, crashing your program. Use a general `HashMap` or a larger `int[128]` / `int[256]` array to count all standard ASCII characters.
+
+---
+
+> 👉 Next, open `06-Recursion.md` to explore the beauty of recursive call stacks! 💪
