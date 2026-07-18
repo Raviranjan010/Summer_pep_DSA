@@ -1,372 +1,264 @@
 # 🔗 10 — Linked List
 
-> 🚂 **Explain Like I'm 5:** A train. Each coach (node) holds cargo (a value) and is coupled to the **next** coach. You can't jump to coach 5 — you walk from the engine, coach by coach. That's a linked list.
-
-```
-[ 1 | • ] → [ 2 | • ] → [ 3 | • ] → [ 4 | null ]
-  val next    val next    val next      (end)
- (head)
-```
-
-> 🔑 **The #1 difference from arrays:** no index jumping. No `list[3]`. You must *walk* using `.next`.
-
-> 💛 Two days of content here. Day 1 builds the foundation (6 problems). Day 2 combines them into real interview problems (6 more). **These 12 problems cover ~90% of linked-list interview patterns.** Go slow. Draw boxes and arrows on paper for every one.
+> **Explain Like I'm 5:** Think of a train. Each train coach (called a **Node**) carries some cargo (the value) and is coupled to the **next** coach via a link. You cannot jump directly to coach 5 — you must walk from the engine, coach by coach. That's a Linked List!
+>
+> ```
+> [ 10 | • ] ──► [ 20 | • ] ──► [ 30 | • ] ──► NULL (end of train)
+>   val next       val next       val next
+>  (head)
+> ```
 
 ---
 
-## 📋 The Interview Cheat Sheet (one-glance reference)
+## 🧠 Memory Layout: Arrays vs. Linked Lists
 
-| Pattern | Technique | Problems |
-|---------|-----------|----------|
-| Walk the list | `curr = curr.next` | Traverse, Length, Search |
-| Find middle | Slow (1 step) + Fast (2 steps) | Middle, Palindrome |
-| Reverse | prev / curr / next | Reverse, Palindrome |
-| Detect cycle | Floyd's (slow + fast meet) | Cycle I, Cycle II |
-| Build a result list | Dummy node | Merge, Remove Nth, Add Two Numbers |
-| Pointer gap | Move fast `n` steps first | Remove Nth From End |
-| Carry math | `sum % 10`, `sum / 10` | Add Two Numbers |
-| Rearrange pointers | Maintain separate chains | Odd-Even |
+To understand why we need Linked Lists, let's compare how they reside in RAM compared to Arrays:
+
+| Feature | Arrays | Linked Lists |
+| :--- | :--- | :--- |
+| **Memory Allocation** | Contiguous (one single block in RAM) | Scattered (individual blocks in Heap memory) |
+| **Random Access** | $O(1)$ (Using index offset arithmetic) | $O(n)$ (Must traverse element by element) |
+| **Insert / Delete at End** | $O(1)$ amortized | $O(n)$ (without tail pointer) or $O(1)$ (with tail pointer) |
+| **Insert / Delete at Start**| $O(n)$ (Requires shifting all elements) | $O(1)$ (Only swap a few pointers) |
+| **Cache Locality** | Highly cache-friendly (spatial locality) | Poor cache-friendliness (scattered references) |
+
+### Visualizing Linked List Memory Scattering
+In a Linked List, nodes are allocated anywhere in Heap memory. They contain a pointer/reference variable storing the address of the next node:
+
+```
+HEAP ADDRESSES:
+
+Address 0x1048: Node [ Val: 10 | Next: 0x2090 ] ─────┐
+                                                      │
+Address 0x10B4: Node [ Val: 30 | Next: NULL   ] ◄─────┼─────┐
+                                                      │     │
+Address 0x2090: Node [ Val: 20 | Next: 0x10B4 ] ◄─────┘     │
+                                                            │
+Logical Flow:   Head (0x1048) ──► Node (0x2090) ──► Node (0x10B4) ──► NULL
+```
 
 ---
 
-# 🟢 DAY 1 — FOUNDATIONS
+## 🛠️ The Node Class Definition
 
-## Problem 1 — Traverse a Linked List
-
-> Visit every node once and print its value. The most basic linked-list loop — you'll write it hundreds of times.
+Here is how a Node is defined in Java, Python, and C++:
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Node Class Implementations</summary>
 
+### Java
 ```java
-void traverse(ListNode head) {
-    ListNode curr = head;
-    while (curr != null) {
-        System.out.print(curr.val + " ");
-        curr = curr.next;               // take one step
+public class ListNode {
+    public int val;
+    public ListNode next;
+    
+    public ListNode(int val) {
+        this.val = val;
+        this.next = null;
     }
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+### Python
 ```python
-def traverse(head):
-    curr = head
-    while curr:
-        print(curr.val, end=" ")
-        curr = curr.next                 # take one step
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+### C++
 ```cpp
-void traverse(ListNode* head) {
-    ListNode* curr = head;
-    while (curr != nullptr) {
-        cout << curr->val << " ";
-        curr = curr->next;               // take one step
-    }
-}
+struct ListNode {
+    int val;
+    ListNode* next;
+    
+    ListNode(int x) : val(x), next(nullptr) {}
+};
 ```
 </details>
-
-> ⏱️ Time O(n) · Space O(1)
 
 ---
 
-## Problem 2 — Find Length of Linked List
+## 📋 The Interview Pattern Cheat-Sheet
 
-> Count how many nodes exist. Same loop, just count instead of print.
-
-<details>
-<summary>☕ Java</summary>
-
-```java
-int length(ListNode head) {
-    int count = 0;
-    while (head != null) {
-        count++;
-        head = head.next;
-    }
-    return count;
-}
-```
-</details>
-
-<details>
-<summary>🐍 Python</summary>
-
-```python
-def length(head):
-    count = 0
-    while head:
-        count += 1
-        head = head.next
-    return count
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-int length(ListNode* head) {
-    int count = 0;
-    while (head) {
-        count++;
-        head = head->next;
-    }
-    return count;
-}
-```
-</details>
-
-> ⏱️ Time O(n) · Space O(1)
+| Pattern | Description | Key Mechanism |
+| :--- | :--- | :--- |
+| **Traversal** | Move sequentially through the list. | `curr = curr.next` |
+| **Fast & Slow** | Pointers moving at different speeds. | `slow = slow.next`, `fast = fast.next.next` |
+| **Pointer Flip** | Reversing node linkages. | `next = curr.next; curr.next = prev; prev = curr; curr = next;` |
+| **Dummy Node** | A fake node pointing to the head. | Eliminates head deletion/insertion edge cases. |
 
 ---
 
-## Problem 3 — Search Element in Linked List
+## 🟢 Day 1: Foundational Pointers
 
-> Linear search — walk and compare each value to the target.
+These problems form the building blocks of all linked list manipulations.
 
-<details>
-<summary>☕ Java</summary>
+### Solution 4: Middle of the Linked List
 
-```java
-boolean search(ListNode head, int key) {
-    while (head != null) {
-        if (head.val == key) return true;
-        head = head.next;
-    }
-    return false;
-}
-```
-</details>
+**Intuition:** 
+Use a slow pointer and a fast pointer.
+- `slow` moves 1 step at a time.
+- `fast` moves 2 steps at a time.
+When `fast` reaches the end (`null` or `fast.next` is `null`), `slow` will be exactly at the middle node.
+
+**Complexity:**
+- **Time:** $O(n)$ — Single pass traversal.
+- **Space:** $O(1)$ — Two pointer variables.
 
 <details>
-<summary>🐍 Python</summary>
+<summary>💻 Multi-Language Code</summary>
 
-```python
-def search(head, key):
-    while head:
-        if head.val == key:
-            return True
-        head = head.next
-    return False
-```
-</details>
-
-<details>
-<summary>⚡ C++</summary>
-
-```cpp
-bool search(ListNode* head, int key) {
-    while (head) {
-        if (head->val == key) return true;
-        head = head->next;
-    }
-    return false;
-}
-```
-</details>
-
-> ⏱️ Time O(n) · Space O(1)
-
----
-
-## Problem 4 — Middle of the Linked List `(LC 876)` ⭐
-
-> **Trick: slow (1 step) + fast (2 steps).** When fast reaches the end, slow is at the middle. No need to count length first!
-
-```
-1 → 2 → 3 → 4 → 5
-
-slow=1  fast=1
-slow=2  fast=3
-slow=3  fast=5 → fast.next is null → STOP
-
-Middle = 3  ✅
-```
-
-<details>
-<summary>☕ Java</summary>
-
+#### Java
 ```java
 public ListNode middleNode(ListNode head) {
-    ListNode slow = head, fast = head;
+    ListNode slow = head;
+    ListNode fast = head;
     while (fast != null && fast.next != null) {
-        slow = slow.next;              // 1 step
-        fast = fast.next.next;         // 2 steps
+        slow = slow.next;        // 1 step
+        fast = fast.next.next;   // 2 steps
     }
     return slow;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def middleNode(self, head):
+def middleNode(head):
     slow = fast = head
     while fast and fast.next:
-        slow = slow.next               # 1 step
-        fast = fast.next.next          # 2 steps
+        slow = slow.next        # 1 step
+        fast = fast.next.next   # 2 steps
     return slow
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 ListNode* middleNode(ListNode* head) {
     ListNode* slow = head;
     ListNode* fast = head;
     while (fast && fast->next) {
-        slow = slow->next;             // 1 step
-        fast = fast->next->next;       // 2 steps
+        slow = slow->next;       // 1 step
+        fast = fast->next->next; // 2 steps
     }
     return slow;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
-
 ---
 
-## Problem 5 — Reverse Linked List `(LC 206)` ⭐⭐
+### Solution 5: Reverse Linked List
 
-> **The most important linked-list problem.** Three pointers: `prev`, `curr`, `next`. The order never changes: **save → flip → move → move.**
+**Intuition:**
+We reverse the linkages of the nodes in-place. We need three pointers:
+- `prev`: The node behind our current pointer (starts as `null`).
+- `curr`: Our current pointer (starts as `head`).
+- `next`: Temporarily stores the node ahead of us before we flip pointers.
 
 ```
-Before:  1 → 2 → 3 → 4 → null
-After:   null ← 1 ← 2 ← 3 ← 4
-
-Step by step:
-prev=null  curr=1
-  next=2, flip 1→null, prev=1, curr=2
-prev=1     curr=2
-  next=3, flip 2→1,    prev=2, curr=3
-prev=2     curr=3
-  next=4, flip 3→2,    prev=3, curr=4
-prev=3     curr=4
-  next=null, flip 4→3, prev=4, curr=null → STOP
-
-return prev (which is 4, the new head)
+Execution Loop (Save -> Flip -> Move -> Move):
+1. next = curr.next   (Save next node)
+2. curr.next = prev   (Flip pointer backward)
+3. prev = curr        (Move prev forward)
+4. curr = next        (Move curr forward)
 ```
+
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public ListNode reverseList(ListNode head) {
-    ListNode prev = null, curr = head;
+    ListNode prev = null;
+    ListNode curr = head;
     while (curr != null) {
-        ListNode next = curr.next;      // 1. save what's ahead
-        curr.next = prev;               // 2. flip the arrow backward
-        prev = curr;                    // 3. move prev up
-        curr = next;                    // 4. move curr up
+        ListNode next = curr.next; // 1. Save what's ahead
+        curr.next = prev;          // 2. Flip connection backward
+        prev = curr;               // 3. Move prev up
+        curr = next;               // 4. Move curr up
     }
-    return prev;                        // new head
+    return prev; // prev ends up pointing to the new head
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def reverseList(self, head):
-    prev, curr = None, head
+def reverseList(head):
+    prev = None
+    curr = head
     while curr:
-        nxt = curr.next                 # 1. save what's ahead
-        curr.next = prev                # 2. flip the arrow backward
-        prev = curr                     # 3. move prev up
-        curr = nxt                      # 4. move curr up
-    return prev                         # new head
+        nxt = curr.next   # 1. Save what's ahead
+        curr.next = prev  # 2. Flip connection backward
+        prev = curr       # 3. Move prev up
+        curr = nxt        # 4. Move curr up
+    return prev
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 ListNode* reverseList(ListNode* head) {
     ListNode* prev = nullptr;
     ListNode* curr = head;
     while (curr) {
-        ListNode* next = curr->next;    // 1. save what's ahead
-        curr->next = prev;              // 2. flip the arrow backward
-        prev = curr;                    // 3. move prev up
-        curr = next;                    // 4. move curr up
+        ListNode* next = curr->next; // 1. Save what's ahead
+        curr->next = prev;           // 2. Flip connection backward
+        prev = curr;                 // 3. Move prev up
+        curr = next;                 // 4. Move curr up
     }
-    return prev;                        // new head
+    return prev;
 }
 ```
 </details>
-
-> 🧠 **Say it while you write:** save → flip → move → move. Drill this until your fingers know it.
-
-> ⏱️ Time O(n) · Space O(1)
 
 ---
 
-## Problem 6 — Linked List Cycle `(LC 141)` ⭐
+### Solution 6: Linked List Cycle (Floyd's Cycle Finding Algorithm)
 
-> **Floyd's Algorithm.** Slow moves 1 step, fast moves 2 steps. If there's a loop, fast will lap slow and they'll **meet**. If fast hits null, no cycle.
+**Intuition:**
+If there is a cycle, a fast pointer moving 2 steps at a time will eventually meet a slow pointer moving 1 step at a time inside the loop (like a fast runner lapping a slow runner on a track). If there is no cycle, `fast` will hit `null`.
 
-```
-1 → 2 → 3 → 4
-        ↑    ↓
-        └────┘
-
-slow=1 fast=1
-slow=2 fast=3
-slow=3 fast=2       (fast looped around!)
-slow=4 fast=4       → MEET → cycle exists ✅
-```
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public boolean hasCycle(ListNode head) {
-    ListNode slow = head, fast = head;
+    ListNode slow = head;
+    ListNode fast = head;
     while (fast != null && fast.next != null) {
         slow = slow.next;
         fast = fast.next.next;
-        if (slow == fast) return true;  // they met → cycle!
+        if (slow == fast) {
+            return true; // Met -> Cycle exists
+        }
     }
-    return false;                       // fast hit null → no cycle
+    return false; // Reached end -> No cycle
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def hasCycle(self, head):
+def hasCycle(head):
     slow = fast = head
     while fast and fast.next:
         slow = slow.next
         fast = fast.next.next
         if slow == fast:
-            return True                 # they met → cycle!
-    return False                        # fast hit null → no cycle
+            return True
+    return False
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 bool hasCycle(ListNode* head) {
     ListNode* slow = head;
@@ -374,296 +266,261 @@ bool hasCycle(ListNode* head) {
     while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
-        if (slow == fast) return true;  // they met → cycle!
+        if (slow == fast) {
+            return true;
+        }
     }
     return false;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
-
 ---
 
-## 🟢 Day 1 Summary
+## 🟡 Day 2: Interview Combinations
 
-```
-Traverse     → curr = curr.next
-Length        → count++
-Search        → linear search walk
-Middle        → slow / fast pointer
-Reverse       → prev / curr / next (save → flip → move → move)
-Cycle Detect  → Floyd's (slow + fast meet)
-```
+These problems combine Day 1 skills to solve complex scenarios.
 
-> ✅ If you can write all six from memory, you have the foundation. Day 2 is just *combining* these.
+### Solution 7: Remove Nth Node From End of List
 
----
+**Intuition:**
+We need to remove the $N$-th node from the end. 
+- Use a `dummy` node pointing to the head.
+- Place `slow` and `fast` pointers at `dummy`.
+- Move `fast` forward by $N + 1$ steps. This establishes a gap of size $N$ between `slow` and `fast`.
+- Move both together at the same speed. When `fast` reaches `null`, `slow` will point to the node **just before** the target.
+- Perform insertion deletion: `slow.next = slow.next.next`.
 
-# 🟡 DAY 2 — INTERVIEW-LEVEL PROBLEMS
-
-> Every problem below is a **combination** of Day 1 techniques. No new tricks — just mixing the ones you already know.
-
----
-
-## Problem 7 — Remove Nth Node From End `(LC 19)` ⭐
-
-> **Technique: gap of `n` between two pointers.**
-> Move `fast` ahead by `n` steps first. Then move both together. When `fast` hits null, `slow` is right before the target.
-
-```
-1 → 2 → 3 → 4 → 5     n = 2
-
-Move fast 2+1 steps (using dummy): fast is at 4
-Then walk together:
-  slow=1 fast=4
-  slow=2 fast=5
-  slow=3 fast=null → STOP
-  
-slow.next = slow.next.next → skip node 4
-Result: 1 → 2 → 3 → 5
-```
-
-> 💡 **Why a dummy node?** If we need to remove the *head* itself (n = length), there's no node before it. The dummy solves that edge case.
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public ListNode removeNthFromEnd(ListNode head, int n) {
     ListNode dummy = new ListNode(0);
     dummy.next = head;
-    ListNode slow = dummy, fast = dummy;
-
-    for (int i = 0; i <= n; i++)           // move fast n+1 steps ahead
+    ListNode slow = dummy;
+    ListNode fast = dummy;
+    
+    // Step 1: Move fast pointer N+1 steps forward
+    for (int i = 0; i <= n; i++) {
         fast = fast.next;
-
-    while (fast != null) {                 // walk together
+    }
+    
+    // Step 2: Move both together until fast reaches null
+    while (fast != null) {
         slow = slow.next;
         fast = fast.next;
     }
-
-    slow.next = slow.next.next;            // skip the target node
+    
+    // Step 3: Delete node
+    slow.next = slow.next.next;
     return dummy.next;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def removeNthFromEnd(self, head, n):
+def removeNthFromEnd(head, n):
     dummy = ListNode(0)
     dummy.next = head
     slow = fast = dummy
-
-    for _ in range(n + 1):                 # move fast n+1 steps ahead
+    
+    for _ in range(n + 1):
         fast = fast.next
-
-    while fast:                            # walk together
+        
+    while fast:
         slow = slow.next
         fast = fast.next
-
-    slow.next = slow.next.next             # skip the target node
+        
+    slow.next = slow.next.next
     return dummy.next
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 ListNode* removeNthFromEnd(ListNode* head, int n) {
     ListNode* dummy = new ListNode(0);
     dummy->next = head;
     ListNode* slow = dummy;
     ListNode* fast = dummy;
-
-    for (int i = 0; i <= n; i++)           // move fast n+1 steps ahead
+    
+    for (int i = 0; i <= n; i++) {
         fast = fast->next;
-
-    while (fast) {                         // walk together
+    }
+    
+    while (fast) {
         slow = slow->next;
         fast = fast->next;
     }
-
-    slow->next = slow->next->next;         // skip the target node
-    return dummy->next;
+    
+    slow->next = slow->next->next;
+    ListNode* result = dummy->next;
+    delete dummy; // Clean heap allocation
+    return result;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
-
 ---
 
-## Problem 8 — Merge Two Sorted Lists `(LC 21)` ⭐
+### Solution 8: Merge Two Sorted Lists
 
-> **Technique: dummy node + compare & attach.** Like merging two sorted decks of cards — always pick the smaller top card.
-
-```
-l1: 1 → 2 → 4
-l2: 1 → 3 → 4
-
-Compare 1 vs 1 → take l1's 1
-Compare 2 vs 1 → take l2's 1
-Compare 2 vs 3 → take 2
-Compare 4 vs 3 → take 3
-Compare 4 vs 4 → take l1's 4
-l1 done → attach remaining l2: 4
-
-Result: 1 → 1 → 2 → 3 → 4 → 4
-```
+**Complexity:**
+- **Time:** $O(n + m)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
     ListNode dummy = new ListNode(0);
     ListNode tail = dummy;
-
-    while (l1 != null && l2 != null) {
-        if (l1.val <= l2.val) {
-            tail.next = l1;
-            l1 = l1.next;
+    
+    while (list1 != null && list2 != null) {
+        if (list1.val <= list2.val) {
+            tail.next = list1;
+            list1 = list1.next;
         } else {
-            tail.next = l2;
-            l2 = l2.next;
+            tail.next = list2;
+            list2 = list2.next;
         }
         tail = tail.next;
     }
-    tail.next = (l1 != null) ? l1 : l2;   // attach leftovers
+    
+    // Attach remainder nodes
+    tail.next = (list1 != null) ? list1 : list2;
     return dummy.next;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def mergeTwoLists(self, l1, l2):
+def mergeTwoLists(list1, list2):
     dummy = ListNode(0)
     tail = dummy
-
-    while l1 and l2:
-        if l1.val <= l2.val:
-            tail.next = l1
-            l1 = l1.next
+    
+    while list1 and list2:
+        if list1.val <= list2.val:
+            tail.next = list1
+            list1 = list1.next
         else:
-            tail.next = l2
-            l2 = l2.next
+            tail.next = list2
+            list2 = list2.next
         tail = tail.next
-
-    tail.next = l1 if l1 else l2           # attach leftovers
+        
+    tail.next = list1 if list1 else list2
     return dummy.next
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
-ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
     ListNode dummy(0);
     ListNode* tail = &dummy;
-
-    while (l1 && l2) {
-        if (l1->val <= l2->val) {
-            tail->next = l1;
-            l1 = l1->next;
+    
+    while (list1 && list2) {
+        if (list1->val <= list2->val) {
+            tail->next = list1;
+            list1 = list1->next;
         } else {
-            tail->next = l2;
-            l2 = l2->next;
+            tail->next = list2;
+            list2 = list2->next;
         }
         tail = tail->next;
     }
-    tail->next = l1 ? l1 : l2;            // attach leftovers
+    
+    tail->next = list1 ? list1 : list2;
     return dummy.next;
 }
 ```
 </details>
 
-> ⏱️ Time O(n + m) · Space O(1)
-
 ---
 
-## Problem 9 — Add Two Numbers `(LC 2)` ⭐
+### Solution 9: Add Two Numbers
 
-> **Technique: carry math.** Numbers are stored in reverse order (ones digit first). Walk both lists simultaneously, adding digits + carry.
-> **Core formula:** `sum = x + y + carry`, `digit = sum % 10`, `carry = sum / 10`
-
-```
-l1: 2 → 4 → 3        (represents 342)
-l2: 5 → 6 → 4        (represents 465)
-
-2+5+0 = 7  digit=7 carry=0
-4+6+0 = 10 digit=0 carry=1
-3+4+1 = 8  digit=8 carry=0
-
-Result: 7 → 0 → 8    (represents 807)   ✅
-```
+**Complexity:**
+- **Time:** $O(\max(n, m))$
+- **Space:** $O(\max(n, m))$ to construct the result list.
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     ListNode dummy = new ListNode(0);
     ListNode tail = dummy;
     int carry = 0;
-
+    
     while (l1 != null || l2 != null || carry > 0) {
         int sum = carry;
-        if (l1 != null) { sum += l1.val; l1 = l1.next; }
-        if (l2 != null) { sum += l2.val; l2 = l2.next; }
-        tail.next = new ListNode(sum % 10);   // digit
-        carry = sum / 10;                      // carry
+        if (l1 != null) {
+            sum += l1.val;
+            l1 = l1.next;
+        }
+        if (l2 != null) {
+            sum += l2.val;
+            l2 = l2.next;
+        }
+        
+        tail.next = new ListNode(sum % 10);
+        carry = sum / 10;
         tail = tail.next;
     }
     return dummy.next;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def addTwoNumbers(self, l1, l2):
+def addTwoNumbers(l1, l2):
     dummy = ListNode(0)
     tail = dummy
     carry = 0
-
+    
     while l1 or l2 or carry:
-        s = carry
-        if l1: s += l1.val; l1 = l1.next
-        if l2: s += l2.val; l2 = l2.next
-        tail.next = ListNode(s % 10)           # digit
-        carry = s // 10                        # carry
+        val = carry
+        if l1:
+            val += l1.val
+            l1 = l1.next
+        if l2:
+            val += l2.val
+            l2 = l2.next
+            
+        tail.next = ListNode(val % 10)
+        carry = val // 10
         tail = tail.next
-
+        
     return dummy.next
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
     ListNode* dummy = new ListNode(0);
     ListNode* tail = dummy;
     int carry = 0;
-
+    
     while (l1 || l2 || carry) {
         int sum = carry;
-        if (l1) { sum += l1->val; l1 = l1->next; }
-        if (l2) { sum += l2->val; l2 = l2->next; }
-        tail->next = new ListNode(sum % 10);   // digit
-        carry = sum / 10;                       // carry
+        if (l1) {
+            sum += l1->val;
+            l1 = l1->next;
+        }
+        if (l2) {
+            sum += l2->val;
+            l2 = l2->next;
+        }
+        tail->next = new ListNode(sum % 10);
+        carry = sum / 10;
         tail = tail->next;
     }
     return dummy->next;
@@ -671,73 +528,63 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
 ```
 </details>
 
-> 🔑 **The `|| carry > 0` in the while condition** handles the final carry (e.g. 99 + 1 = 100 → that last `1` needs a new node).
-
-> ⏱️ Time O(max(n, m)) · Space O(max(n, m))
-
 ---
 
-## Problem 10 — Linked List Cycle II `(LC 142)` ⭐
+### Solution 10: Linked List Cycle II
 
-> **Find WHERE the cycle starts.** Step 1: Floyd's to find the meeting point. Step 2: one pointer from `head`, other from meeting point, both move 1 step — where they meet is the cycle start. (The math works out — trust it.)
+**Intuition:**
+1. Run Floyd's algorithm to detect if a cycle exists. Let the meeting point of `slow` and `fast` be node $M$.
+2. Reset `slow` back to `head`. Keep `fast` at meeting point $M$.
+3. Move both pointers forward 1 step at a time. The node where they meet is the start of the cycle.
+*(Proof: Let distance from head to cycle start be $D$. Let cycle length be $C$. The distance from cycle start to meeting point is $K$. The math shows that $D = x \cdot C - K$, which means the distance from head to cycle start is congruent to the distance from the meeting point to cycle start).*
 
-```
-1 → 2 → 3 → 4 → 5
-        ↑         ↓
-        └─────────┘
-
-Floyd's: slow & fast meet at some node inside the cycle.
-Then: p1 starts at head, p2 starts at meeting point.
-  p1=1 p2=meeting
-  p1=2 p2=...
-  p1=3 p2=3 → MEET → cycle starts at 3  ✅
-```
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public ListNode detectCycle(ListNode head) {
-    ListNode slow = head, fast = head;
+    ListNode slow = head;
+    ListNode fast = head;
+    
     while (fast != null && fast.next != null) {
         slow = slow.next;
         fast = fast.next.next;
-        if (slow == fast) {                // met inside the cycle
-            slow = head;                   // reset one to head
-            while (slow != fast) {         // both move 1 step now
+        if (slow == fast) {
+            // Cycle detected. Find start node.
+            slow = head;
+            while (slow != fast) {
                 slow = slow.next;
                 fast = fast.next;
             }
-            return slow;                   // meeting point = cycle start
+            return slow; // Start of cycle
         }
     }
-    return null;                           // no cycle
+    return null; // No cycle
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def detectCycle(self, head):
+def detectCycle(head):
     slow = fast = head
     while fast and fast.next:
         slow = slow.next
         fast = fast.next.next
-        if slow == fast:                   # met inside the cycle
-            slow = head                    # reset one to head
-            while slow != fast:            # both move 1 step
+        if slow == fast:
+            slow = head
+            while slow != fast:
                 slow = slow.next
                 fast = fast.next
-            return slow                    # cycle start
-    return None                            # no cycle
+            return slow
+    return None
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 ListNode* detectCycle(ListNode* head) {
     ListNode* slow = head;
@@ -745,86 +592,92 @@ ListNode* detectCycle(ListNode* head) {
     while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
-        if (slow == fast) {                // met inside the cycle
-            slow = head;                   // reset one to head
-            while (slow != fast) {         // both move 1 step
+        if (slow == fast) {
+            slow = head;
+            while (slow != fast) {
                 slow = slow->next;
                 fast = fast->next;
             }
-            return slow;                   // cycle start
+            return slow;
         }
     }
-    return nullptr;                        // no cycle
+    return nullptr;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
-
 ---
 
-## Problem 11 — Palindrome Linked List `(LC 234)` ⭐
+### Solution 11: Palindrome Linked List
 
-> **Combines three Day 1 skills:** find middle → reverse second half → compare both halves.
+**Intuition:**
+1. Find the middle of the list using slow/fast pointers.
+2. Reverse the second half of the list starting from the middle node.
+3. Compare the values of the first half (from `head`) and the reversed second half.
 
-```
-1 → 2 → 2 → 1
-
-Step 1: find middle → split into  1 → 2  |  2 → 1
-Step 2: reverse second half →             1 → 2
-Step 3: compare  1==1 ✅  2==2 ✅ → palindrome!
-```
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public boolean isPalindrome(ListNode head) {
-    // 1. find middle
-    ListNode slow = head, fast = head;
+    // 1. Find middle
+    ListNode slow = head;
+    ListNode fast = head;
     while (fast != null && fast.next != null) {
         slow = slow.next;
         fast = fast.next.next;
     }
-    // 2. reverse second half
-    ListNode prev = null, curr = slow;
+    
+    // 2. Reverse second half
+    ListNode prev = null;
+    ListNode curr = slow;
     while (curr != null) {
         ListNode next = curr.next;
         curr.next = prev;
         prev = curr;
         curr = next;
     }
-    // 3. compare both halves
-    ListNode left = head, right = prev;
+    
+    // 3. Compare halves
+    ListNode left = head;
+    ListNode right = prev;
     while (right != null) {
-        if (left.val != right.val) return false;
+        if (left.val != right.val) {
+            return false;
+        }
         left = left.next;
         right = right.next;
     }
     return true;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def isPalindrome(self, head):
-    # 1. find middle
+def isPalindrome(head):
+    # 1. Find middle
     slow = fast = head
     while fast and fast.next:
         slow = slow.next
         fast = fast.next.next
-    # 2. reverse second half
-    prev, curr = None, slow
+        
+    # 2. Reverse second half
+    prev = None
+    curr = slow
     while curr:
         nxt = curr.next
         curr.next = prev
         prev = curr
         curr = nxt
-    # 3. compare both halves
-    left, right = head, prev
+        
+    # 3. Compare halves
+    left = head
+    right = prev
     while right:
         if left.val != right.val:
             return False
@@ -832,21 +685,19 @@ def isPalindrome(self, head):
         right = right.next
     return True
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 bool isPalindrome(ListNode* head) {
-    // 1. find middle
+    // 1. Find middle
     ListNode* slow = head;
     ListNode* fast = head;
     while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
     }
-    // 2. reverse second half
+    
+    // 2. Reverse second half
     ListNode* prev = nullptr;
     ListNode* curr = slow;
     while (curr) {
@@ -855,7 +706,8 @@ bool isPalindrome(ListNode* head) {
         prev = curr;
         curr = next;
     }
-    // 3. compare both halves
+    
+    // 3. Compare halves
     ListNode* left = head;
     ListNode* right = prev;
     while (right) {
@@ -868,142 +720,97 @@ bool isPalindrome(ListNode* head) {
 ```
 </details>
 
-> 🧠 **This is the "combo" problem.** If you can do middle + reverse + traverse, you can do palindrome. It's Day 1 skills stacked.
-
-> ⏱️ Time O(n) · Space O(1)
-
 ---
 
-## Problem 12 — Odd Even Linked List `(LC 328)` ⭐
+### Solution 12: Odd Even Linked List
 
-> **Separate odd-positioned and even-positioned nodes into two chains, then join them.** (Position 1, 3, 5… then 2, 4, 6…)
+**Intuition:**
+We create two separate chains: one for nodes at odd indices, one for nodes at even indices.
+- Initialize `odd = head` and `even = head.next`.
+- Store `evenHead = even` to connect the end of the odd chain to the beginning of the even chain later.
+- Loop and decouple nodes:
+  `odd.next = even.next; odd = odd.next;`
+  `even.next = odd.next; even = even.next;`
+- Conclude by linking `odd.next = evenHead`.
 
-```
-1 → 2 → 3 → 4 → 5
-
-Odd chain:  1 → 3 → 5
-Even chain: 2 → 4
-
-Join: 1 → 3 → 5 → 2 → 4
-```
+**Complexity:**
+- **Time:** $O(n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
 public ListNode oddEvenList(ListNode head) {
     if (head == null) return null;
     ListNode odd = head;
     ListNode even = head.next;
-    ListNode evenHead = even;              // save start of even chain
-
+    ListNode evenHead = even;
+    
     while (even != null && even.next != null) {
-        odd.next = even.next;              // odd skips to next odd
+        odd.next = even.next;
         odd = odd.next;
-        even.next = odd.next;              // even skips to next even
+        even.next = odd.next;
         even = even.next;
     }
-    odd.next = evenHead;                   // join chains
+    odd.next = evenHead;
     return head;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
-def oddEvenList(self, head):
+def oddEvenList(head):
     if not head:
         return None
     odd = head
     even = head.next
-    even_head = even                       # save start of even chain
-
+    even_head = even
+    
     while even and even.next:
-        odd.next = even.next               # odd skips to next odd
+        odd.next = even.next
         odd = odd.next
-        even.next = odd.next               # even skips to next even
+        even.next = odd.next
         even = even.next
-
-    odd.next = even_head                   # join chains
+        
+    odd.next = even_head
     return head
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 ListNode* oddEvenList(ListNode* head) {
     if (!head) return nullptr;
     ListNode* odd = head;
     ListNode* even = head->next;
-    ListNode* evenHead = even;             // save start of even chain
-
+    ListNode* evenHead = even;
+    
     while (even && even->next) {
-        odd->next = even->next;            // odd skips to next odd
+        odd->next = even->next;
         odd = odd->next;
-        even->next = odd->next;            // even skips to next even
+        even->next = odd->next;
         even = even->next;
     }
-    odd->next = evenHead;                  // join chains
+    odd->next = evenHead;
     return head;
 }
 ```
 </details>
 
-> ⏱️ Time O(n) · Space O(1)
+---
+
+## ⚠️ Beginner Pitfalls & Common Mistakes
+
+1. **Null Pointer Exceptions (Dereferencing Null):**
+   - The #1 source of crashes in linked list code.
+   - Doing `curr = curr.next` when `curr` is `null` will throw a crash.
+   - Doing `fast.next.next` when `fast` is `null` or `fast.next` is `null` will throw a crash. Always write bounds guard checks first: `while (fast != null && fast.next != null)`.
+
+2. **Pointer Loss (The Orphan Trap):**
+   - If you do `head.next = prev` without saving the original `head.next` pointer first, you sever the link to the rest of the list. That remaining list gets orphaned in memory.
+   - **Rule:** Always record pointers to variables *before* you overwrite them.
 
 ---
 
-## 🧠 Day 2 Pattern Recognition
-
-```
-LC 19    Remove Nth  →  Gap between two pointers + dummy
-LC 21    Merge       →  Dummy node + compare & attach
-LC 2     Add Numbers →  Carry handling (sum%10, sum/10)
-LC 142   Cycle II    →  Floyd + math (head + meeting point)
-LC 234   Palindrome  →  Middle + Reverse + Compare
-LC 328   Odd-Even    →  Separate chains + join
-```
-
-> Every single one uses techniques from Day 1. If a Day 2 problem feels hard, go back and re-drill the Day 1 technique it's built on.
-
----
-
-# 🎯 Practice (in order)
-
-**Day 1 — Foundations:**
-
-| Problem | Difficulty | Link | Technique |
-|---------|-----------|------|-----------|
-| Middle of the Linked List | Easy | https://leetcode.com/problems/middle-of-the-linked-list/ | slow / fast |
-| Reverse Linked List | Easy | https://leetcode.com/problems/reverse-linked-list/ | prev / curr / next |
-| Linked List Cycle | Easy | https://leetcode.com/problems/linked-list-cycle/ | Floyd's |
-| Remove Duplicates from Sorted List | Easy | https://leetcode.com/problems/remove-duplicates-from-sorted-list/ | traverse + skip |
-
-**Day 2 — Interview Level:**
-
-| Problem | Difficulty | Link | Technique |
-|---------|-----------|------|-----------|
-| Remove Nth Node From End of List | Medium | https://leetcode.com/problems/remove-nth-node-from-end-of-list/ | gap + dummy |
-| Merge Two Sorted Lists | Easy | https://leetcode.com/problems/merge-two-sorted-lists/ | dummy + compare |
-| Add Two Numbers | Medium | https://leetcode.com/problems/add-two-numbers/ | carry math |
-| Linked List Cycle II | Medium | https://leetcode.com/problems/linked-list-cycle-ii/ | Floyd + reset |
-| Palindrome Linked List | Easy | https://leetcode.com/problems/palindrome-linked-list/ | middle + reverse |
-| Odd Even Linked List | Medium | https://leetcode.com/problems/odd-even-linked-list/ | separate chains |
-
-**Bonus (when the above feel easy):**
-
-| Problem | Difficulty | Link | Technique |
-|---------|-----------|------|-----------|
-| Intersection of Two Linked Lists | Easy | https://leetcode.com/problems/intersection-of-two-linked-lists/ | length diff or two-pass |
-| Rotate List | Medium | https://leetcode.com/problems/rotate-list/ | length + connect + break |
-| Swap Nodes in Pairs | Medium | https://leetcode.com/problems/swap-nodes-in-pairs/ | pointer rewiring |
-| Reorder List | Medium | https://leetcode.com/problems/reorder-list/ | middle + reverse + merge |
-| Sort List | Medium | https://leetcode.com/problems/sort-list/ | merge sort on LL |
-
----
-
-> 🌟 **These 12 core problems cover ~90% of linked-list patterns in placement interviews.** Master Day 1 first — it's the floor. Day 2 is just combinations. Draw every problem on paper. I'm right here for any doubt. 💪 — *Ajai Raj (Mentor)*
+> 👉 Next, open `11-Stack.md` to explore LIFO stack operations! 💪

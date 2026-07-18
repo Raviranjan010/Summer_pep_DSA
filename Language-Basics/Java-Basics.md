@@ -25,9 +25,9 @@ public class Main {
 ## 2. Variables & Types
 
 ```java
-int a = 5;               // whole number
-long big = 1000000000L;   // huge whole number (note the L)
-double d = 3.14;          // decimal
+int a = 5;               // whole number (32-bit)
+long big = 1000000000L;   // huge whole number (64-bit, note the L)
+double d = 3.14;          // decimal (64-bit float)
 char c = 'a';             // single character (single quotes!)
 boolean flag = true;      // true / false
 String s = "hello";       // text (double quotes!)
@@ -41,7 +41,7 @@ String s = "hello";       // text (double quotes!)
 
 ```java
 int[] arr = new int[5];              // 5 zeros: [0,0,0,0,0]
-int[] arr = {10, 20, 30};            // direct values
+int[] arr2 = {10, 20, 30};           // direct values
 int n = arr.length;                  // size (NO brackets — it's a field, not length())
 arr[0] = 99;                         // set
 int x = arr[2];                      // read
@@ -55,7 +55,7 @@ int[][] grid = new int[3][4];        // 3 rows, 4 columns
 grid[1][2] = 7;
 ```
 
-> 🔑 Array size is `arr.length` (no parentheses). String length is `s.length()` (with parentheses). Java is inconsistent here — just remember it.
+> 🔑 Array size is `arr.length` (no parentheses). String length is `s.length()` (with parentheses).
 
 ---
 
@@ -91,10 +91,9 @@ String up = s.toUpperCase();
 boolean has = s.contains("ell");
 ```
 
-> ⚠️ **Compare strings with `.equals()`, not `==`.** `==` checks if they're the same object, not the same text.
+> ⚠️ **Compare strings with `.equals()`, not `==`.** `==` checks if they point to the exact same object in memory, not if they contain the same text.
 
 ### Building strings in a loop → use StringBuilder
-
 ```java
 StringBuilder sb = new StringBuilder();
 sb.append("a");
@@ -102,7 +101,7 @@ sb.append(c);
 String result = sb.toString();       // convert back when done
 ```
 
-> 🔑 **Why?** `String` is immutable. Doing `s = s + c` in a loop is secretly O(n²). StringBuilder is O(n).
+> 🔑 **Why?** `String` is immutable. Doing `s = s + c` in a loop takes $O(n^2)$ time because of copying. StringBuilder does it in $O(n)$ time.
 
 ---
 
@@ -133,13 +132,8 @@ map.containsKey('a');                // check existence
 map.remove('a');
 map.size();
 
-// ⭐ getOrDefault — THE counting shortcut you asked about
+// ⭐ getOrDefault — THE counting shortcut
 map.put(c, map.getOrDefault(c, 0) + 1);
-// means: "get count of c, or 0 if not there, then add 1"
-// without it you'd write:
-//   if (map.containsKey(c)) map.put(c, map.get(c) + 1);
-//   else map.put(c, 1);
-// getOrDefault does both in one clean line.
 
 // loop over a map
 for (Map.Entry<Character, Integer> e : map.entrySet()) {
@@ -178,14 +172,83 @@ list.size();
 list.remove(0);                      // remove by index
 list.contains(10);
 Collections.sort(list);              // sort ascending
-Collections.sort(list, (a, b) -> b - a);   // sort descending (custom order)
+Collections.sort(list, (a, b) -> b - a);   // sort descending
 ```
-
-> 🔑 **Array vs ArrayList:** array = fixed size, fast. ArrayList = grows automatically, more flexible. Use ArrayList when you don't know the size ahead of time.
 
 ---
 
-## 10. Sorting with Custom Order (comparators)
+## 10. Advanced Collections for DSA
+
+### A. Deque (ArrayDeque) — Used for Stack & Queue
+Do not use the legacy `Stack` class (it has slow synchronization overhead). Use `ArrayDeque`.
+```java
+// 1. Stack behavior (LIFO)
+Deque<Integer> stack = new ArrayDeque<>();
+stack.push(10);
+stack.peek();                        // Look at top
+stack.pop();                         // Remove from top
+
+// 2. Queue behavior (FIFO)
+Deque<Integer> queue = new ArrayDeque<>();
+queue.offer(10);                     // Add to back
+queue.peek();                        // Look at front
+queue.poll();                        // Remove from front
+```
+
+### B. PriorityQueue — Min/Max Heap
+Used for top-K elements, merging arrays, and greedy algorithms.
+```java
+// 1. Min Heap (Default): smallest values first
+PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+minHeap.offer(10);
+minHeap.offer(5);
+minHeap.peek();                      // Returns 5 (smallest)
+minHeap.poll();                      // Removes 5
+
+// 2. Max Heap: largest values first
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+maxHeap.offer(10);
+maxHeap.offer(15);
+maxHeap.peek();                      // Returns 15 (largest)
+```
+
+### C. TreeSet & TreeMap (Sorted Set/Map)
+Keeps elements sorted at all times. Search, insert, and delete take $O(\log n)$ time.
+```java
+// 1. TreeSet
+TreeSet<Integer> ts = new TreeSet<>();
+ts.add(10);
+ts.add(5);
+ts.first();                          // Returns 5 (smallest)
+ts.last();                           // Returns 10 (largest)
+ts.higher(5);                        // Returns 10 (smallest element strictly greater than 5)
+
+// 2. TreeMap
+TreeMap<Integer, String> tm = new TreeMap<>();
+tm.put(10, "apple");
+tm.put(5, "banana");
+tm.firstKey();                       // Returns 5 (smallest key)
+tm.lastKey();                        // Returns 10 (largest key)
+```
+
+---
+
+## 11. Time Complexities Cheat-Sheet
+
+| Data Structure | Operation | Method | Time Complexity |
+| :--- | :--- | :--- | :--- |
+| **Array** | Access index | `arr[i]` | $O(1)$ |
+| | Search element | (Loop) | $O(n)$ |
+| **ArrayList** | Access index / Append | `list.get(i)` / `list.add(x)` | $O(1)$ |
+| | Insert / Delete (middle)| `list.add(idx, x)` / `list.remove(idx)` | $O(n)$ |
+| **HashMap / Set** | Insert / Lookup / Delete | `put` / `get` / `contains` | $O(1)$ average |
+| **PriorityQueue** | Insert / Delete Min-Max | `offer` / `poll` | $O(\log n)$ |
+| | Peek Min-Max | `peek` | $O(1)$ |
+| **TreeSet / Map** | Insert / Lookup / Delete | `add` / `contains` / `put` | $O(\log n)$ |
+
+---
+
+## 12. Sorting with Custom Order (Comparators)
 
 ```java
 Arrays.sort(arr);                            // ascending (primitives only ascending)
@@ -193,16 +256,16 @@ Collections.sort(list);                      // ascending
 Collections.sort(list, (a, b) -> a - b);     // ascending
 Collections.sort(list, (a, b) -> b - a);     // descending
 
-// sort by map value (e.g. Sort Characters By Frequency)
-List<Character> chars = new ArrayList<>(map.keySet());
-chars.sort((a, b) -> map.get(b) - map.get(a));   // highest count first
+// Sort 2D arrays (e.g. by start time in interval scheduling)
+int[][] intervals = {{1,3}, {2,6}, {8,10}};
+Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0])); // Ascending by col 0
 ```
 
-> 🧠 **Reading a comparator:** `(a, b) -> a - b` means "ascending." Flip to `b - a` for "descending." That's the whole trick.
+> 🧠 **Reading a comparator:** `(a, b) -> a - b` means "ascending." Flip to `b - a` for "descending."
 
 ---
 
-## 11. Handy Math & Utilities
+## 13. Handy Math & Utilities
 
 ```java
 Math.max(a, b);   Math.min(a, b);   Math.abs(x);
@@ -214,7 +277,7 @@ Integer.parseInt("123");             // string → number
 
 ---
 
-## 12. Reading Input (for online judges / GfG)
+## 14. Reading Input (for online judges / GfG)
 
 ```java
 Scanner sc = new Scanner(System.in);
@@ -222,7 +285,3 @@ int n = sc.nextInt();                // read one int
 String word = sc.next();             // read one word
 String line = sc.nextLine();         // read whole line
 ```
-
----
-
-> 🎯 **You don't need to memorize this.** Solve with this file open. After ~10 problems, 90% of it becomes automatic. Ask me any line that's unclear. 💪

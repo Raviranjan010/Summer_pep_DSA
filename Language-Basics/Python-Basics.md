@@ -1,6 +1,6 @@
 # 🐍 Python Syntax for DSA — Your Cheat Sheet
 
-> Keep this open while solving. Python is the shortest of the three languages — this covers everything you need for arrays, strings, dicts, and sets.
+> Keep this open while solving. Python is the shortest of the three languages — this covers everything you need for arrays, strings, dicts, sets, heaps, and binary search.
 
 ---
 
@@ -13,21 +13,21 @@ x = int(input())            # read one integer
 words = input().split()     # read a line, split into words
 ```
 
-> 🔑 Python needs **no** `main` function or imports for basic code. Just write and run.
+> 🔑 Python needs **no** class structure or `main` function for basic execution.
 
 ---
 
-## 2. Variables (no type declarations)
+## 2. Variables (dynamic typing)
 
 ```python
 a = 5                       # int
 d = 3.14                    # float
-c = 'a'                     # Python has no separate char — it's a 1-length string
+c = 'a'                     # Python has no separate char type — it's a 1-length string
 flag = True                 # note the capital T (and False)
 s = "hello"                 # string
 ```
 
-> ⚠️ `True`/`False`/`None` are capitalized in Python (unlike `true`/`false` in Java/C++).
+> ⚠️ `True`, `False`, and `None` are capitalized in Python.
 
 ---
 
@@ -40,12 +40,12 @@ n = len(arr)                # size
 arr[0] = 99                 # set
 x = arr[2]                  # read
 
-arr.append(40)              # add to end
-arr.pop()                   # remove & return last
-arr.sort()                  # sort ascending (in place)
-arr.sort(reverse=True)      # sort descending
-arr.reverse()               # reverse in place
-total = sum(arr)            # sum of all
+arr.append(40)              # append to end
+arr.pop()                   # remove & return last from end
+arr.sort()                  # sort ascending (in-place)
+arr.sort(reverse=True)      # sort descending (in-place)
+arr.reverse()               # reverse in-place
+total = sum(arr)            # sum of all elements
 biggest = max(arr)          # largest
 smallest = min(arr)         # smallest
 
@@ -54,7 +54,7 @@ grid = [[0] * 4 for _ in range(3)]   # 3 rows, 4 cols
 grid[1][2] = 7
 ```
 
-> ⚠️ **Careful:** `[[0]*4]*3` is a trap — it makes 3 copies of the *same* row. Always use `[[0]*4 for _ in range(3)]`.
+> ⚠️ **Careful:** `[[0]*4]*3` is a trap — it makes 3 copies pointing to the *same* row object. Modify one cell, and the whole column changes! Always use `[[0]*4 for _ in range(3)]`.
 
 ---
 
@@ -62,20 +62,18 @@ grid[1][2] = 7
 
 ```python
 for i in range(n):              # 0 to n-1
-    ...
+    pass
 for i in range(1, n):           # 1 to n-1
-    ...
+    pass
 for i in range(n-1, -1, -1):    # backwards: n-1 down to 0
-    ...
-for x in arr:                   # for-each
-    ...
+    pass
+for x in arr:                   # for-each loop
+    pass
 for i, x in enumerate(arr):     # index AND value together
-    ...
+    pass
 while condition:
-    ...
+    pass
 ```
-
-> 🔑 `range(start, stop, step)` — `stop` is **excluded**. `range(1,5)` gives 1,2,3,4.
 
 ---
 
@@ -85,7 +83,7 @@ while condition:
 s[1:4]        # chars from index 1 to 3 (4 excluded)
 s[:3]         # first 3 chars
 s[2:]         # from index 2 to end
-s[::-1]       # REVERSED (whole thing backwards) — famous trick!
+s[::-1]       # REVERSED (whole thing backwards)
 arr[::-1]     # reversed list
 ```
 
@@ -100,10 +98,10 @@ s[2]                        # character at index 2
 s.upper()   s.lower()
 s.split()                   # "a b c" → ['a','b','c']
 "".join(list_of_chars)      # ['a','b'] → "ab"
-s == "hello"                # compare content — == works fine in Python
+s == "hello"                # compares contents directly
 'ell' in s                  # substring check → True
-s.isalnum()                 # is it letters/numbers only?
-list(s)                     # string → list of chars
+s.isalnum()                 # letters/numbers only? (bool)
+list(s)                     # string → list of characters ['h','e','l','l','o']
 ```
 
 ---
@@ -120,113 +118,126 @@ freq = [0] * 26
 freq[ord(c) - ord('a')] += 1
 ```
 
-> 🔑 Python uses `ord()` (char → number) and `chr()` (number → char), where Java/C++ just do `c - 'a'`.
-
 ---
 
-## 8. Dictionaries (key → value) — counting & mapping
+## 8. Dictionaries (HashMap equivalent)
 
 ```python
 mp = {}
 
 mp['a'] = 1                 # add / overwrite
-mp['a']                     # read (ERROR if missing — see below)
-'a' in mp                   # check existence
-del mp['a']
+mp['a']                     # read (Throws KeyError if key is missing!)
+'a' in mp                   # check key existence
+del mp['a']                 # delete key
 len(mp)
 
-# ⭐ counting — the getOrDefault equivalent:
+# ⭐ getOrDefault equivalent:
 mp[c] = mp.get(c, 0) + 1    # "get c, or 0 if missing, then +1"
 
-# loop over a dict
-for key in mp:              # keys
-    ...
-for key, val in mp.items(): # keys AND values
-    ...
+# loops
+for key in mp:              # loop over keys
+    pass
+for key, val in mp.items(): # loop over keys AND values
+    pass
 ```
 
-### Even easier: Counter (auto-counting dict)
-
+### collections.Counter (Auto-counting dict)
 ```python
 from collections import Counter
 
-freq = Counter("hello")     # {'l':2, 'h':1, 'e':1, 'o':1} automatically!
+freq = Counter("hello")     # {'l': 2, 'h': 1, 'e': 1, 'o': 1}
 freq['l']                   # 2
-freq.most_common()          # [('l',2), ('h',1), ...] sorted by count!
-freq.most_common(1)         # top 1
-
-# Counter math (used in Find Common Characters):
-Counter("bella") & Counter("label")   # keeps the MINIMUM of each key
+freq.most_common()          # [('l', 2), ('h', 1), ...] (sorted by counts descending)
 ```
-
-> 🔑 **`Counter` is Python's secret weapon** for frequency problems. It replaces a whole counting loop.
 
 ---
 
-## 9. Sets (unique items) — "have I seen this?"
+## 9. Sets (Uniqueness check)
 
 ```python
 seen = set()
 
-seen.add(5)                 # add (duplicates ignored)
-5 in seen                   # seen it?
+seen.add(5)                 # add
+5 in seen                   # seen it? (O(1) average check)
 seen.remove(5)
 len(seen)
 
-for x in seen:
-    ...
-
 # quick duplicate check:
-len(set(arr)) != len(arr)   # True if there are duplicates
+has_duplicates = len(set(arr)) != len(arr)
 ```
 
 ---
 
-## 10. Sorting with Custom Order
+## 10. Advanced Libraries for DSA
+
+### A. heapq (PriorityQueue / Heaps)
+Python's `heapq` module provides a Min-Heap implementation on standard lists in-place.
+```python
+import heapq
+
+heap = []
+# 1. Min Heap
+heapq.heappush(heap, 10)
+heapq.heappush(heap, 5)
+heap[0]                     # Peek: returns 5 (smallest)
+heapq.heappop(heap)         # Pop: removes and returns 5
+
+# 2. Max Heap: Multiply values by -1 before pushing
+max_heap = []
+heapq.heappush(max_heap, -10)
+heapq.heappush(max_heap, -15)
+largest = -heapq.heappop(max_heap) # Returns 15
+```
+
+### B. bisect (Binary Search Library)
+Provides fast binary search functions on sorted lists.
+```python
+import bisect
+
+arr = [1, 3, 3, 5, 7]
+# 1. bisect_left: Find index of first element >= target (lower bound)
+idx = bisect.bisect_left(arr, 3)    # Returns 1 (index of first '3')
+
+# 2. bisect_right: Find index of first element > target (upper bound)
+idx = bisect.bisect_right(arr, 3)   # Returns 3 (index of '5')
+```
+
+### C. collections.deque (Double-Ended Queue)
+Use for stacks and queues. Fast $O(1)$ insertions/deletions at both ends.
+```python
+from collections import deque
+
+dq = deque()
+dq.append(10)               # Append at back
+dq.appendleft(20)           # Insert at front
+dq.pop()                    # Remove from back
+dq.popleft()                # Remove from front
+```
+
+---
+
+## 11. Time Complexities Python Cheat-Sheet
+
+| Structure | Operation | Syntax | Time Complexity |
+| :--- | :--- | :--- | :--- |
+| **List** | Access / Append / Pop | `arr[i]` / `append` / `pop()` | $O(1)$ |
+| | Insert / Delete (middle) | `insert(idx, x)` / `pop(idx)` | $O(n)$ |
+| | List Slice | `arr[i:j]` | $O(j - i)$ |
+| **Dict / Set** | Insert / Lookup / Delete | `d[k]` / `k in d` / `del d[k]` | $O(1)$ average |
+| **Heap** | Push / Pop | `heappush` / `heappop` | $O(\log n)$ |
+| **Deque** | Append / Pop at ends | `appendleft` / `popleft` | $O(1)$ |
+
+---
+
+## 12. Sorting with Custom Order
 
 ```python
-arr.sort()                          # ascending
+arr.sort()                          # ascending (in-place)
 arr.sort(reverse=True)              # descending
-sorted(arr)                         # returns a NEW sorted list
+sorted_arr = sorted(arr)            # returns a new sorted list
 
-# sort by a custom key
-words.sort(key=len)                 # by length
-words.sort(key=lambda w: -len(w))   # by length, descending
-
-# sort dict items by value (descending)
-sorted(mp.items(), key=lambda x: -x[1])
+# sort using a lambda key function
+words = ["apple", "banana", "kiwi"]
+words.sort(key=len)                 # sort by length: ["kiwi", "apple", "banana"]
+words.sort(key=lambda w: -len(w))   # sort by length descending
 ```
-
-> 🧠 **`key=lambda x: ...`** tells Python *what* to sort by. Add a `-` (or `reverse=True`) to flip the order.
-
----
-
-## 11. Handy Utilities
-
-```python
-max(a, b)   min(a, b)   abs(x)
-a, b = b, a                 # swap in one line
-float('inf')                # infinity (for min-tracking)
-float('-inf')               # negative infinity (for max-tracking)
-str(123)                    # number → string
-int("123")                  # string → number
-```
-
----
-
-## 12. Functions
-
-```python
-def solve(nums, target):
-    # ... do work ...
-    return answer
-
-# call it
-result = solve([1,2,3], 5)
-```
-
-> On LeetCode you'll write methods inside a `class Solution:` with `self` as the first parameter — that's just their format, the logic is the same.
-
----
-
-> 🎯 **Python does more with less** — `Counter`, slicing (`s[::-1]`), and `sorted(key=...)` save you loops. Keep this open while solving, and it'll click within a handful of problems. Ask me anytime. 💪
