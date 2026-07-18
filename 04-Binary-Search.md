@@ -1,141 +1,166 @@
 # 🔍 04 — Binary Search
 
-> **Explain Like I'm 5:** Finding a word in a dictionary. You don't read page 1, 2, 3... You open the **middle**, decide if your word is before or after, and throw away half the book instantly. Repeat. That's binary search — and it's *lightning fast*.
+> **Explain Like I'm 5:** Finding a name in a physical phonebook. You don't start at page 1. You flip open the exact **middle**. If the name is alphabetically later, you throw away the entire left half of the book. You repeat this in the remaining pages. In just a few flips, you find the name out of millions!
+>
+> ⚠️ **The Golden Rule:** The input array **must be sorted**. If it is unsorted, binary search will fail.
 
-> ⚠️ **One golden rule:** Binary search only works on a **SORTED** array.
+---
+
+## 📐 Why is it so fast? (The Mathematical Proof)
+
+If you use Linear Search, looking for a target in an array of size $n$ takes up to $n$ steps.
+In Binary Search, the search space is cut in half at every step. Let's see how many elements are left after $k$ steps:
+
+- **Start:** $n$ elements
+- **Step 1:** $\frac{n}{2}$ elements
+- **Step 2:** $\frac{n}{4} = \frac{n}{2^2}$ elements
+- **Step 3:** $\frac{n}{8} = \frac{n}{2^3}$ elements
+- ...
+- **Step $k$:** $\frac{n}{2^k}$ elements
+
+The search terminates when the search space shrinks to $1$ element:
+
+$$\frac{n}{2^k} = 1 \implies 2^k = n \implies k = \log_2(n)$$
+
+Thus, the maximum number of steps is $\log_2(n)$.
+- For $n = 1,000,000$ elements, linear search takes up to $1,000,000$ steps. Binary search takes at most $\mathbf{20}$ steps! ($\log_2(1,000,000) \approx 19.93$)
+
+---
+
+## 🎨 Visualizing Search Range Shrinkage
+
+Here is a visual trace of searching for target `7` in the sorted array `[1, 3, 5, 7, 9, 11]`:
 
 ```
-Find 7 in:  [1, 3, 5, 7, 9, 11]
-             low      mid      high
-mid = 5 → 7 > 5 → answer is on the RIGHT → throw away the left half → repeat
+Step 1:
+[ 1,  3,  5,  7,  9,  11 ]
+  ▲           ▲        ▲
+ low         mid      high
+ arr[mid] = 5 < 7. Target is on the RIGHT. 
+ Throw away left side. Set low = mid + 1 (index 3).
+
+Step 2:
+               [ 7,  9,  11 ]
+                 ▲   ▲    ▲
+                low mid  high
+ arr[mid] = 9 > 7. Target is on the LEFT.
+ Throw away right side. Set high = mid - 1 (index 3).
+
+Step 3:
+               [ 7 ]
+                 ▲
+             low, mid, high
+ arr[mid] = 7 == 7. Found! Return index 3.
 ```
 
 ---
 
-## The Core Code
+## 📋 The 3 Binary Search Templates
 
-<details>
-<summary>☕ Java</summary>
+Not all Binary Search problems are about finding an exact number. There are 3 core patterns:
 
-```java
-int binarySearch(int[] arr, int target) {
-    int low = 0, high = arr.length - 1;
-    while (low <= high) {
-        int mid = low + (high - low) / 2;   // safe middle
-        if (arr[mid] == target) return mid; // found it!
-        else if (arr[mid] < target) low = mid + 1;  // go right
-        else high = mid - 1;                // go left
-    }
-    return -1;                              // not found
-}
-```
-</details>
-
-<details>
-<summary>🐍 Python</summary>
+### Template 1: Pure Exact Match Search
+Used when searching for a specific target in a sorted collection.
 
 ```python
-def binary_search(arr, target):
-    low, high = 0, len(arr) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if arr[mid] == target:
-            return mid                       # found it!
-        elif arr[mid] < target:
-            low = mid + 1                    # go right
-        else:
-            high = mid - 1                   # go left
-    return -1                                # not found
+# Template 1: Exact Match
+low, high = 0, len(arr) - 1
+while low <= high:
+    mid = low + (high - low) // 2
+    if arr[mid] == target:
+        return mid  # Found it!
+    elif arr[mid] < target:
+        low = mid + 1
+    else:
+        high = mid - 1
+return -1  # Not found
 ```
-</details>
+
+### Template 2: Boundary/Condition Search (Floor, Ceil, Lower Bound)
+Used when searching for the *first* or *last* element satisfying a condition (e.g. first element $\ge$ target). We track a candidate variable `ans`.
+
+```python
+# Template 2: Boundary (e.g., Floor: largest value <= target)
+low, high = 0, len(arr) - 1
+ans = -1
+while low <= high:
+    mid = low + (high - low) // 2
+    if arr[mid] <= target:
+        ans = mid      # Record candidate index
+        low = mid + 1  # Look for a larger valid value to the right
+    else:
+        high = mid - 1 # Too large, look left
+return ans
+```
+
+### Template 3: Search on Answer Space
+Used when solving word problems where the answer is a number in a known range (e.g., eating speed between $1$ and $10^9$).
+```python
+# Template 3: Search on Answer
+low, high = MIN_POSSIBLE_ANSWER, MAX_POSSIBLE_ANSWER
+ans = -1
+while low <= high:
+    mid = low + (high - low) // 2
+    if is_valid_answer(mid):
+        ans = mid      # Record valid answer
+        high = mid - 1 # Try to find a smaller (better) valid answer
+    else:
+        low = mid + 1  # Search for larger speeds
+return ans
+```
+
+---
+
+## 🎯 Practice Problems & Worked Solutions
+
+Practice these standard questions to master Binary Search.
+
+| # | Problem | Difficulty | Link | Key Idea |
+|---|---|---|---|---|
+| 1 | Binary Search | Easy | [LeetCode](https://leetcode.com/problems/binary-search/) | Exact match search. |
+| 2 | Search Insert Position | Easy | [LeetCode](https://leetcode.com/problems/search-insert-position/) | Finding insertion index. |
+| 3 | First & Last Position | Medium | [LeetCode](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/) | Two separate boundary searches. |
+| 4 | Floor in a Sorted Array | Easy | [GeeksforGeeks](https://www.geeksforgeeks.org/problems/floor-in-a-sorted-array-1587115620/1) | Find largest element $\le$ target. |
+| 5 | Search in Rotated Sorted Array | Medium | [LeetCode](https://leetcode.com/problems/search-in-rotated-sorted-array/) | Identify which half is sorted. |
+
+---
+
+### Solution 1: Binary Search (Exact Match)
+
+**Complexity:**
+- **Time:** $O(\log n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>⚡ C++</summary>
+<summary>💻 Multi-Language Code</summary>
 
-```cpp
-int binarySearch(int arr[], int n, int target) {
-    int low = 0, high = n - 1;
-    while (low <= high) {
-        int mid = low + (high - low) / 2;   // safe middle
-        if (arr[mid] == target) return mid; // found it!
-        else if (arr[mid] < target) low = mid + 1;  // go right
-        else high = mid - 1;                // go left
-    }
-    return -1;                              // not found
-}
-```
-</details>
-
-> ⏱️ **Time:** O(log n) — for 1,00,000 elements, only ~17 steps! · **Space:** O(1)
-
----
-
-## 🧠 3 Beginner Traps (Read Carefully)
-
-> 1. **The array MUST be sorted.** No exceptions.
-> 2. Write `low + (high - low) / 2`, not `(low + high) / 2` — the second one can overflow on huge numbers.
-> 3. Use `low <= high` (with the **=**). Forgetting the equals sign is the #1 beginner bug.
-
----
-
-## Dry Run It (Do This On Paper!)
-
-Find `7` in `[1, 3, 5, 7, 9]`:
-
-| Step | low | high | mid | arr[mid] | Action |
-|------|-----|------|-----|----------|--------|
-| 1 | 0 | 4 | 2 | 5 | 7 > 5 → go right, low = 3 |
-| 2 | 3 | 4 | 3 | 7 | 7 == 7 → **return 3** ✅ |
-
-> Tracing it by hand like this is the fastest way to *truly* understand binary search. Do it once with paper and pen — it'll click.
-
----
-
-## 🎯 Practice (Start Easy)
-
-| Problem | Where | Link |
-|---------|-------|------|
-| Binary Search | LeetCode | https://leetcode.com/problems/binary-search/ |
-| Search Insert Position | LeetCode | https://leetcode.com/problems/search-insert-position/ |
-| First and Last Position of Element | LeetCode | https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/ |
-| Floor in a Sorted Array | GfG | https://www.geeksforgeeks.org/problems/floor-in-a-sorted-array-1587115620/1 |
-| Search in Rotated Sorted Array | LeetCode | https://leetcode.com/problems/search-in-rotated-sorted-array/ |
-
-> 💡 **Do the first one ("Binary Search") until you can write it without looking.** That single problem is worth a whole day. Everything else here is just a small twist on it. I'm here for any doubt. 🙏
-
----
-
-# ✅ Worked Solutions
-
-> Every one is just the core binary search with a tiny twist. Spot the same skeleton each time.
-
-## Solution 1 — Binary Search
-
-<details>
-<summary>☕ Java</summary>
-
+#### Java
 ```java
-int search(int[] nums, int target) {
-    int low = 0, high = nums.length - 1;
+public int search(int[] nums, int target) {
+    int low = 0;
+    int high = nums.length - 1;
     while (low <= high) {
+        // Safe middle calculation to prevent integer overflow
         int mid = low + (high - low) / 2;
-        if (nums[mid] == target) return mid;
-        else if (nums[mid] < target) low = mid + 1;
-        else high = mid - 1;
+        if (nums[mid] == target) {
+            return mid; // Target found
+        } else if (nums[mid] < target) {
+            low = mid + 1; // Search right half
+        } else {
+            high = mid - 1; // Search left half
+        }
     }
-    return -1;
+    return -1; // Not found
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def search(nums, target):
     low, high = 0, len(nums) - 1
     while low <= high:
-        mid = (low + high) // 2
+        # '//' is integer division in Python
+        mid = low + (high - low) // 2
         if nums[mid] == target:
             return mid
         elif nums[mid] < target:
@@ -144,58 +169,66 @@ def search(nums, target):
             high = mid - 1
     return -1
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 int search(vector<int>& nums, int target) {
-    int low = 0, high = nums.size() - 1;
+    int low = 0;
+    int high = nums.size() - 1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
-        if (nums[mid] == target) return mid;
-        else if (nums[mid] < target) low = mid + 1;
-        else high = mid - 1;
+        if (nums[mid] == target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
     return -1;
 }
 ```
 </details>
 
-> ⏱️ Time O(log n) · Space O(1)
-
 ---
 
-## Solution 2 — Search Insert Position
+### Solution 2: Search Insert Position
 
-> **Idea:** Same search. If not found, `low` ends up exactly where the target *should* be inserted.
+**Intuition:** 
+Run standard binary search. If the target is not found, the `low` pointer will end up pointing to the index where the target *should* be inserted to maintain sorted order.
+
+**Complexity:**
+- **Time:** $O(\log n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-int searchInsert(int[] nums, int target) {
-    int low = 0, high = nums.length - 1;
+public int searchInsert(int[] nums, int target) {
+    int low = 0;
+    int high = nums.length - 1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
-        if (nums[mid] == target) return mid;
-        else if (nums[mid] < target) low = mid + 1;
-        else high = mid - 1;
+        if (nums[mid] == target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
-    return low;          // the insert position
+    return low; // low represents the insertion position
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def search_insert(nums, target):
     low, high = 0, len(nums) - 1
     while low <= high:
-        mid = (low + high) // 2
+        mid = low + (high - low) // 2
         if nums[mid] == target:
             return mid
         elif nums[mid] < target:
@@ -204,235 +237,292 @@ def search_insert(nums, target):
             high = mid - 1
     return low
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 int searchInsert(vector<int>& nums, int target) {
     int low = 0, high = nums.size() - 1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
-        if (nums[mid] == target) return mid;
-        else if (nums[mid] < target) low = mid + 1;
-        else high = mid - 1;
+        if (nums[mid] == target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
     return low;
 }
 ```
 </details>
 
-> ⏱️ Time O(log n) · Space O(1)
-
 ---
 
-## Solution 3 — First and Last Position of Element
+### Solution 3: First & Last Position of Element in Sorted Array
 
-> **Idea:** Run binary search **twice** — once biased to keep going *left* (first occurrence), once biased *right* (last occurrence).
+**Intuition:**
+Run binary search twice.
+1. First run finds the left boundary (first occurrence). When `nums[mid] == target`, save `mid` as a candidate but continue searching *left* by setting `high = mid - 1`.
+2. Second run finds the right boundary (last occurrence). When `nums[mid] == target`, save `mid` but continue searching *right* by setting `low = mid + 1`.
+
+**Complexity:**
+- **Time:** $O(\log n)$ — Two independent binary searches.
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-int[] searchRange(int[] nums, int target) {
+public int[] searchRange(int[] nums, int target) {
     int first = findBound(nums, target, true);
-    int last  = findBound(nums, target, false);
+    int last = findBound(nums, target, false);
     return new int[]{first, last};
 }
-int findBound(int[] nums, int target, boolean isFirst) {
-    int low = 0, high = nums.length - 1, result = -1;
+
+private int findBound(int[] nums, int target, boolean isFirst) {
+    int low = 0, high = nums.length - 1;
+    int ans = -1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
         if (nums[mid] == target) {
-            result = mid;
-            if (isFirst) high = mid - 1;   // keep looking left
-            else low = mid + 1;            // keep looking right
-        } else if (nums[mid] < target) low = mid + 1;
-        else high = mid - 1;
+            ans = mid; // Record candidate
+            if (isFirst) {
+                high = mid - 1; // Keep searching left
+            } else {
+                low = mid + 1;  // Keep searching right
+            }
+        } else if (nums[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
-    return result;
+    return ans;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def search_range(nums, target):
     def find_bound(is_first):
-        low, high, result = 0, len(nums) - 1, -1
+        low, high = 0, len(nums) - 1
+        ans = -1
         while low <= high:
-            mid = (low + high) // 2
+            mid = low + (high - low) // 2
             if nums[mid] == target:
-                result = mid
+                ans = mid
                 if is_first:
-                    high = mid - 1      # keep looking left
+                    high = mid - 1  # Keep looking left
                 else:
-                    low = mid + 1       # keep looking right
+                    low = mid + 1   # Keep looking right
             elif nums[mid] < target:
                 low = mid + 1
             else:
                 high = mid - 1
-        return result
+        return ans
     return [find_bound(True), find_bound(False)]
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 int findBound(vector<int>& nums, int target, bool isFirst) {
-    int low = 0, high = nums.size() - 1, result = -1;
+    int low = 0, high = nums.size() - 1;
+    int ans = -1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
         if (nums[mid] == target) {
-            result = mid;
-            if (isFirst) high = mid - 1;   // keep looking left
-            else low = mid + 1;            // keep looking right
-        } else if (nums[mid] < target) low = mid + 1;
-        else high = mid - 1;
+            ans = mid;
+            if (isFirst) {
+                high = mid - 1; // Look left
+            } else {
+                low = mid + 1;  // Look right
+            }
+        } else if (nums[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
-    return result;
+    return ans;
 }
+
 vector<int> searchRange(vector<int>& nums, int target) {
     return {findBound(nums, target, true), findBound(nums, target, false)};
 }
 ```
 </details>
 
-> ⏱️ Time O(log n) · Space O(1)
-
 ---
 
-## Solution 4 — Floor in a Sorted Array
+### Solution 4: Floor in a Sorted Array
 
-> **Floor** = the largest element that is ≤ target. When `mid` is ≤ target, record it and search right for something even bigger (but still ≤ target).
+**Intuition:**
+Use Template 2.
+We seek the largest index `i` such that `arr[i] <= x`.
+- If `arr[mid] <= x`, then `mid` is a valid candidate for the floor. We store `ans = mid` and search the right half (`low = mid + 1`) to check if there is an even larger element that is still $\le x$.
+- If `arr[mid] > x`, the element is too large. We search the left half (`high = mid - 1`).
+
+**Complexity:**
+- **Time:** $O(\log n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-int findFloor(int[] arr, int x) {
-    int low = 0, high = arr.length - 1, ans = -1;
+public int findFloor(long[] arr, int n, long x) {
+    int low = 0;
+    int high = n - 1;
+    int ans = -1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
         if (arr[mid] <= x) {
-            ans = mid;          // candidate floor
-            low = mid + 1;      // try to find a bigger valid one
-        } else high = mid - 1;
+            ans = mid;      // Valid floor candidate
+            low = mid + 1;  // Try to find a larger value
+        } else {
+            high = mid - 1; // Element is too large, search left
+        }
     }
-    return ans;                 // index of floor (-1 if none)
+    return ans;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def find_floor(arr, x):
-    low, high, ans = 0, len(arr) - 1, -1
+    low, high = 0, len(arr) - 1
+    ans = -1
     while low <= high:
-        mid = (low + high) // 2
+        mid = low + (high - low) // 2
         if arr[mid] <= x:
-            ans = mid           # candidate floor
-            low = mid + 1       # try for a bigger valid one
+            ans = mid
+            low = mid + 1  # Seek larger valid candidates
         else:
-            high = mid - 1
+            high = mid - 1 # Seek smaller values
     return ans
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
-int findFloor(vector<int>& arr, int x) {
-    int low = 0, high = arr.size() - 1, ans = -1;
+int findFloor(vector<long long>& arr, long long x) {
+    int low = 0;
+    int high = arr.size() - 1;
+    int ans = -1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
         if (arr[mid] <= x) {
-            ans = mid;          // candidate floor
-            low = mid + 1;      // try for a bigger valid one
-        } else high = mid - 1;
+            ans = mid;
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
     return ans;
 }
 ```
 </details>
 
-> ⏱️ Time O(log n) · Space O(1)
-
 ---
 
-## Solution 5 — Search in Rotated Sorted Array
+### Solution 5: Search in Rotated Sorted Array
 
-> **Idea:** Even after rotation, *one half is always sorted*. Find the sorted half, check if the target lies inside it, and search accordingly.
+**Intuition:**
+A sorted array that has been rotated contains two sorted sub-sections (e.g. `[4, 5, 6, 7, 0, 1, 2]`).
+If we choose a pivot index `mid`, **at least one of the halves (left or right) is guaranteed to be normally sorted**.
+1. Find if the left half is sorted: `nums[low] <= nums[mid]`.
+   - If yes: check if `target` lies inside the left half range (`nums[low] <= target < nums[mid]`). If it does, search left (`high = mid - 1`); otherwise search right (`low = mid + 1`).
+2. If the left half is not sorted, the right half must be sorted.
+   - Check if `target` lies inside the right half range (`nums[mid] < target <= nums[high]`). If it does, search right (`low = mid + 1`); otherwise search left (`high = mid - 1`).
+
+**Complexity:**
+- **Time:** $O(\log n)$
+- **Space:** $O(1)$
 
 <details>
-<summary>☕ Java</summary>
+<summary>💻 Multi-Language Code</summary>
 
+#### Java
 ```java
-int search(int[] nums, int target) {
-    int low = 0, high = nums.length - 1;
+public int search(int[] nums, int target) {
+    int low = 0;
+    int high = nums.length - 1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
-        if (nums[mid] == target) return mid;
-        if (nums[low] <= nums[mid]) {            // left half sorted
-            if (nums[low] <= target && target < nums[mid]) high = mid - 1;
-            else low = mid + 1;
-        } else {                                  // right half sorted
-            if (nums[mid] < target && target <= nums[high]) low = mid + 1;
-            else high = mid - 1;
+        if (nums[mid] == target) {
+            return mid;
+        }
+        
+        // 1. Check if Left Half is Sorted
+        if (nums[low] <= nums[mid]) {
+            // Check if target lies within the sorted left half
+            if (nums[low] <= target && target < nums[mid]) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        } 
+        // 2. Otherwise, Right Half must be Sorted
+        else {
+            // Check if target lies within the sorted right half
+            if (nums[mid] < target && target <= nums[high]) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
         }
     }
     return -1;
 }
 ```
-</details>
 
-<details>
-<summary>🐍 Python</summary>
-
+#### Python
 ```python
 def search(nums, target):
     low, high = 0, len(nums) - 1
     while low <= high:
-        mid = (low + high) // 2
+        mid = low + (high - low) // 2
         if nums[mid] == target:
             return mid
-        if nums[low] <= nums[mid]:               # left half sorted
+            
+        # Left half sorted
+        if nums[low] <= nums[mid]:
             if nums[low] <= target < nums[mid]:
                 high = mid - 1
             else:
                 low = mid + 1
-        else:                                    # right half sorted
+        # Right half sorted
+        else:
             if nums[mid] < target <= nums[high]:
                 low = mid + 1
             else:
                 high = mid - 1
     return -1
 ```
-</details>
 
-<details>
-<summary>⚡ C++</summary>
-
+#### C++
 ```cpp
 int search(vector<int>& nums, int target) {
-    int low = 0, high = nums.size() - 1;
+    int low = 0;
+    int high = nums.size() - 1;
     while (low <= high) {
         int mid = low + (high - low) / 2;
         if (nums[mid] == target) return mid;
-        if (nums[low] <= nums[mid]) {            // left half sorted
-            if (nums[low] <= target && target < nums[mid]) high = mid - 1;
-            else low = mid + 1;
-        } else {                                  // right half sorted
-            if (nums[mid] < target && target <= nums[high]) low = mid + 1;
-            else high = mid - 1;
+        
+        if (nums[low] <= nums[mid]) {
+            if (nums[low] <= target && target < nums[mid]) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        } else {
+            if (nums[mid] < target && target <= nums[high]) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
         }
     }
     return -1;
@@ -440,4 +530,18 @@ int search(vector<int>& nums, int target) {
 ```
 </details>
 
-> ⏱️ Time O(log n) · Space O(1). This is the "boss level" of binary search — don't worry if it takes a few tries. 💪
+---
+
+## ⚠️ Beginner Pitfalls & Common Mistakes
+
+1. **Integer Overflow:**
+   - Writing `(low + high) / 2` can cause an overflow error if `low + high` exceeds the maximum value of a 32-bit signed integer ($2 \times 10^9$).
+   - Always use: `low + (high - low) / 2`.
+
+2. **Off-by-One Infinite Loops:**
+   - If you write `while (low < high)` instead of `while (low <= high)`, your loop may terminate early, missing the element when `low == high`.
+   - If you update pointers as `low = mid` or `high = mid`, you can get stuck in an infinite loop because `mid` might not change value. Always shift past `mid`: `low = mid + 1` or `high = mid - 1`.
+
+---
+
+> 👉 Next, open `05-Strings.md` to learn how character sequences are handled and optimized! 💪
