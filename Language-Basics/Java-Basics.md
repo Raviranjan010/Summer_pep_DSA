@@ -285,3 +285,50 @@ int n = sc.nextInt();                // read one int
 String word = sc.next();             // read one word
 String line = sc.nextLine();         // read whole line
 ```
+
+---
+
+## 📋 Step-by-Step Dry Run: Java `HashMap.getOrDefault()`
+
+```java
+String str = "aba";
+HashMap<Character, Integer> map = new HashMap<>();
+for (char c : str.toCharArray()) {
+    map.put(c, map.getOrDefault(c, 0) + 1);
+}
+```
+
+- **Iteration 1 (`c = 'a'`):** `map.getOrDefault('a', 0)` returns `0`. `put('a', 0 + 1 = 1)`. Map state: `{'a': 1}`.
+- **Iteration 2 (`c = 'b'`):** `map.getOrDefault('b', 0)` returns `0`. `put('b', 0 + 1 = 1)`. Map state: `{'a': 1, 'b': 1}`.
+- **Iteration 3 (`c = 'a'`):** `'a'` exists, returns `1`. `put('a', 1 + 1 = 2)`. Map state: `{'a': 2, 'b': 1}`.
+
+**Final Map:** `{'a': 2, 'b': 1}` ✅
+
+---
+
+## 🎓 Java Viva Questions & Answers
+
+### Q1: What is the difference between JDK, JRE, and JVM?
+**Answer:**
+- **JDK (Java Development Kit):** Software development kit containing compiler (`javac`), debugger, and tools needed to write and compile Java programs.
+- **JRE (Java Runtime Environment):** Implementation of JVM + core class libraries required to run compiled Java bytecode (`.class` files).
+- **JVM (Java Virtual Machine):** Abstract computing machine that executes Java bytecode on target operating systems (provides platform independence: "Write Once, Run Anywhere").
+
+### Q2: What is the difference between Primitive types and Reference types in Java?
+**Answer:**
+- **Primitives (`int`, `long`, `double`, `boolean`, `char`):** Store raw binary values directly on the **Stack**. Non-nullable, fixed memory size.
+- **Reference Types (`Objects`, `String`, `Arrays`, `ArrayList`):** Variables on the stack store a memory reference (address) pointing to the actual object stored on the **Heap**. Default value is `null`.
+
+### Q3: Why should `StringBuilder` be used instead of `String` concatenation inside loops?
+**Answer:**
+Java `String` objects are immutable. Performing `s += c` inside a loop creates a new `String` object and copies characters on every iteration, leading to $O(n^2)$ total time complexity. `StringBuilder` uses a dynamic character buffer that appends characters in amortized $O(1)$ time, taking $O(n)$ overall.
+
+### Q4: How did Java 8 improve `HashMap` worst-case performance?
+**Answer:**
+Prior to Java 8, hash collisions were handled using single linked lists (worst-case $O(n)$ lookup). In Java 8+, when the number of items in a single hash bucket exceeds a threshold of 8 (and table capacity $\ge 64$), the bucket transitions from a Linked List to a **Red-Black Tree**, improving worst-case search time to $O(\log n)$.
+
+### Q5: What is the difference between `==` and `.equals()` in Java?
+**Answer:**
+- **`==`:** Reference equality operator. Checks if both variables reference the exact same memory address on the heap.
+- **`.equals()`:** Value equality method. Compares the internal logical content of two objects (overridden in `String`, `Integer`, etc.).
+

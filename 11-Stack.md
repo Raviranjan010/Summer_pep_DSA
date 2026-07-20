@@ -1199,4 +1199,35 @@ Expression Evaluation:
 
 **Coming next (Day 3 preview):** Largest Rectangle in Histogram (LC 84), Asteroid Collision (LC 735), Decode String (LC 394) — all build on today's monotonic stack pattern.
 
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What is a Stack data structure, and what is its governing principle?
+**Answer:**
+A Stack is a linear data structure that follows the **LIFO (Last In, First Out)** principle. The last element inserted onto the stack (`push`) is the first element removed (`pop`). All operations (`push`, `pop`, `peek`/`top`, `isEmpty`) occur at a single end (the top) in $O(1)$ constant time.
+
+### Q2: How do you implement a Stack using an Array vs Linked List?
+**Answer:**
+- **Array-based Stack:** Uses an array and a pointer `top = -1`. Fast and cache-friendly, but has fixed capacity unless dynamically resized ($O(1)$ amortized push).
+- **Linked List-based Stack:** Inserts and deletes nodes at the `head` of the linked list ($head = new\_node$). Dynamic capacity, no resizing required, but extra memory overhead per node pointer.
+
+### Q3: What is a Monotonic Stack, and what are its two main types?
+**Answer:**
+A Monotonic Stack is a stack whose elements are always maintained in a strictly increasing or decreasing order.
+- **Monotonic Decreasing Stack:** Elements from bottom to top are in descending order. Used to find the **Next Greater Element** ($O(n)$ time).
+- **Monotonic Increasing Stack:** Elements from bottom to top are in ascending order. Used to find the **Next Smaller Element** ($O(n)$ time).
+
+### Q4: How does MinStack achieve $O(1)$ time complexity for `getMin()`?
+**Answer:**
+By maintaining a secondary auxiliary stack (`minStack`). Whenever an element $X$ is pushed, we push $\min(X, \text{minStack.peek()})$ onto `minStack`. When an element is popped from the main stack, we pop from `minStack` simultaneously. The top of `minStack` always holds the current minimum in $O(1)$ time.
+
+### Q5: What is Reverse Polish Notation (RPN / Postfix Expression), and why is it preferred by compilers?
+**Answer:**
+In Postfix notation, operators follow their operands (e.g. `A B +` instead of `A + B`).
+**Why compilers prefer it:** Postfix expressions eliminate the need for parentheses and operator precedence parsing rules. A simple Stack can evaluate postfix expressions in a single $O(n)$ scan: push operands, and when an operator is seen, pop 2 operands, compute, and push the result back.
+
+---
+
 > 💡 **Do Day 1 first, then Day 2 top to bottom.** The monotonic stack trick (Problem 1) is the engine behind Problems 2, 3, and 4 — nail that one and the rest fall into place. I'm right here for any doubt. 💪 — *Ajai Raj (Mentor)*
+

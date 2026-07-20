@@ -1273,4 +1273,35 @@ LC 641   Circular Deque        →  fixed array + modulo wraparound
 | Binary Tree Level Order Traversal | Medium | https://leetcode.com/problems/binary-tree-level-order-traversal/ | Tree BFS, level by level |
 | Design Circular Deque | Medium | https://leetcode.com/problems/design-circular-deque/ | Circular array + modulo |
 
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What is a Queue data structure, and what is its fundamental principle?
+**Answer:**
+A Queue is a linear data structure following the **FIFO (First In, First Out)** principle. Elements are inserted at the **rear** (`enqueue` / `offer`) and removed from the **front** (`dequeue` / `poll`). All core operations take $O(1)$ constant time.
+
+### Q2: What is a Circular Queue, and what problem does it solve?
+**Answer:**
+In a standard linear array-based queue, popping elements increments `front`, creating unused empty spaces at the beginning that cannot be reused without expensive $O(n)$ element shifting.
+A **Circular Queue** wraps pointers around using modulo arithmetic (`(rear + 1) % capacity`), reusing freed positions at index 0 in $O(1)$ time.
+
+### Q3: How do you implement a Queue using two Stacks?
+**Answer:**
+Use `inStack` for pushes and `outStack` for pops.
+- **Enqueue:** Push directly onto `inStack` ($O(1)$).
+- **Dequeue:** If `outStack` is empty, pop all elements from `inStack` and push them onto `outStack` (reversing their order to FIFO). Then pop from `outStack`.
+**Amortized Time Complexity:** $O(1)$ per operation because each element is pushed to `inStack`, moved once to `outStack`, and popped once from `outStack`.
+
+### Q4: What is a Double-Ended Queue (Deque)?
+**Answer:**
+A Deque allows insertion and deletion of elements from **both ends** (front and rear) in $O(1)$ time. It combines the capabilities of both a Stack (LIFO) and a Queue (FIFO).
+
+### Q5: What is the role of a Queue in Breadth-First Search (BFS)?
+**Answer:**
+BFS explores nodes layer-by-layer (level-by-level) in order of distance from the source. A Queue naturally enforces this order: nodes at distance $d$ are enqueued before nodes at distance $d+1$, ensuring shortest path discovery in unweighted graphs or trees.
+
+---
+
 > 💡 **Do Day 1 top to bottom first — get comfortable with plain queue mechanics.** Day 2 is where queues start combining with other structures (stacks, BFS, monotonic tricks) — the real interview-level skill. I'm right here for any doubt. 💪 — *Ajai Raj (Mentor)*
+

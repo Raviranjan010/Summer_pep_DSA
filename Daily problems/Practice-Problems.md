@@ -510,4 +510,50 @@
 
 ---
 
+## 📋 Step-by-Step Dry Run Execution Guide for Interviews
+
+When performing a **Dry Run** during coding interviews, follow this standardized 5-step process on paper or whiteboard:
+
+1. **Write down small non-trivial test inputs:** Choose an array size of 4–6 elements including representative values (odd/even, duplicate, positive/negative).
+2. **Tabulate state variables:** Create a table with columns for pointers (`low`, `high`, `left`, `right`), indices (`i`, `j`), running state (`sum`, `max`), and data structures (`stack`, `map`).
+3. **Execute loop step-by-step:** Manually step through the code line by line without skipping iterations.
+4. **Track array/structure modifications:** Explicitly record element swaps, string appends, and stack push/pop actions.
+5. **Test edge cases:** Validate boundary inputs like empty arrays (`n=0`), single-element arrays (`n=1`), all identical elements (`[1, 1, 1]`), and sorted/reverse-sorted inputs.
+
+---
+
+## 🎓 Placement Interview Viva Questions & Answers
+
+### Q1: How do you identify whether to use Binary Search on Answer vs Sliding Window?
+**Answer:**
+- **Binary Search on Answer:** Use when looking for an optimal numerical threshold $K$ (min/max capacity, speed, distance) in a range $[L, R]$, where checking if a candidate threshold is feasible (`isPossible(K)`) is monotonic (if $K$ works, all $K' > K$ work).
+- **Sliding Window:** Use when looking for contiguous sub-arrays or sub-strings in an array/string based on window size or contents.
+
+### Q2: What strategy should you use when your initial brute-force approach is $O(n^2)$?
+**Answer:**
+1. **Sorting ($O(n \log n)$):** Enables Two-Pointer or Binary Search.
+2. **Hashing ($O(n)$ space):** Converts lookup from $O(n)$ to $O(1)$ (e.g. Two-Sum).
+3. **Prefix Sums ($O(n)$ precomputation):** Converts range sum queries to $O(1)$.
+4. **Sliding Window ($O(n)$ time):** Eliminates redundant sub-array recalculations.
+5. **Monotonic Stack/Queue ($O(n)$ time):** Finds Next Greater/Smaller element in linear time.
+
+### Q3: What is the difference between Top-Down (Memoization) and Bottom-Up (Tabulation) Dynamic Programming?
+**Answer:**
+- **Top-Down (Memoization):** Recursive approach starting from target state down to base cases, caching sub-problem results in a hashmap or table to avoid redundant calls.
+- **Bottom-Up (Tabulation):** Iterative approach filling a DP table starting from base cases up to the target state. Usually faster and avoids recursion call-stack overhead.
+
+### Q4: How do you choose between BFS and DFS for Graph problems?
+**Answer:**
+- **BFS (Queue):** Explores level-by-level. Ideal for finding the **shortest path in unweighted graphs** or nearest cell in a grid (Multi-Source BFS).
+- **DFS (Stack/Recursion):** Explores as deep as possible before backtracking. Ideal for topological sorting, cycle detection, connected components, and path finding.
+
+### Q5: How do you explain time and space complexity during a technical interview?
+**Answer:**
+Always state time and space complexity in terms of input parameters ($N, M$).
+- **Time Complexity:** Explain how the operations scale relative to input size $N$ (e.g., "Outer loop runs $N$ times, inner window shrinks $N$ times total, so total time is $O(N)$").
+- **Auxiliary Space:** Explicitly differentiate auxiliary memory allocated (e.g. stack, hashmap) from the memory required to store input/output data.
+
+---
+
 > 🌟 **~202 problems. Every placement pattern covered.** Solve section by section, top to bottom. The order within each section goes from foundation → interview level. You've got this. 💪 — *Ajai Raj (Mentor)*
+

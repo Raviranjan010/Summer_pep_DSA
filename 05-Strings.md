@@ -346,6 +346,20 @@ void reverseString(vector<char>& s) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `s = ["h", "e", "l", "l", "o"]`
+
+| `left` | `right` | Swap Target | Array State | Next `left`, `right` |
+| :---: | :---: | :---: | :---: | :---: |
+| 0 | 4 | `s[0]` ('h') $\leftrightarrow$ `s[4]` ('o') | `["o", "e", "l", "l", "h"]` | 1, 3 |
+| 1 | 3 | `s[1]` ('e') $\leftrightarrow$ `s[3]` ('l') | `["o", "l", "l", "e", "h"]` | 2, 2 |
+| 2 | 2 | `left < right` (False) | Loop terminates | Finished |
+
+**Result:** `["o", "l", "l", "e", "h"]` ✅
+</details>
+
 ---
 
 ### Solution 5: Reverse Words in a String
@@ -408,6 +422,54 @@ string reverseWords(string s) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `s = "  the sky is  blue  "`
+
+1. `trim()` / `split()` extracts words array: `words = ["the", "sky", "is", "blue"]`
+2. Reverse iteration:
+   - `i = 3`: Append `words[3]` ("blue") + `" "` $\rightarrow$ `"blue "`
+   - `i = 2`: Append `words[2]` ("is") + `" "` $\rightarrow$ `"blue is "`
+   - `i = 1`: Append `words[1]` ("sky") + `" "` $\rightarrow$ `"blue is sky "`
+   - `i = 0`: Append `words[0]` ("the") $\rightarrow$ `"blue is sky the"`
+
+**Result:** `"blue is sky the"` ✅
+</details>
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What does String Immutability mean, and why are Strings immutable in Java and Python?
+**Answer:**
+String immutability means once a `String` object is created in memory, its content cannot be altered. If you modify a string, a brand-new String object is created in heap memory.
+**Why?**
+1. **Security:** Strings carry sensitive network URLs, passwords, and file paths.
+2. **Thread Safety:** Immutable objects are inherently thread-safe.
+3. **String Constant Pool:** Allows caching and sharing duplicate string literals to save memory.
+
+### Q2: What is the difference between `String`, `StringBuilder`, and `StringBuffer` in Java?
+**Answer:**
+- **`String`:** Immutable, thread-safe, slow for heavy string concatenation ($O(n^2)$ due to repeated copies).
+- **`StringBuilder`:** Mutable, non-thread-safe, fast $O(1)$ amortized character appends.
+- **`StringBuffer`:** Mutable, thread-safe (synchronized methods), slightly slower than `StringBuilder`.
+
+### Q3: How does `c - 'a'` convert a lowercase character to a 0-indexed integer?
+**Answer:**
+Characters are represented by their ASCII numeric code (`'a' = 97`, `'b' = 98`, ..., `'z' = 122`).
+Subtracting `'a'` (97) offsets the character code to a 0–25 range:
+- `'a' - 'a' = 97 - 97 = 0`
+- `'c' - 'a' = 99 - 97 = 2`
+
+### Q4: Why is string concatenation inside a loop bad practice?
+**Answer:**
+In languages with immutable strings (Java/Python), `res = res + str[i]` creates a new string copy of length $k$ at iteration $i$. Over $n$ loop iterations, total work is $1 + 2 + \dots + n = O(n^2)$ time. Using `StringBuilder` / `list.append()` + `.join()` reduces time to $O(n)$.
+
+### Q5: What is the KMP (Knuth-Morris-Pratt) algorithm, and what problem does it solve?
+**Answer:**
+KMP is a pattern-searching algorithm that finds occurrences of a pattern $P$ of length $m$ inside text $T$ of length $n$ in $O(n + m)$ time. It uses a **Longest Prefix Suffix (LPS)** array to avoid re-checking characters that have already matched.
+
 ---
 
 ## ⚠️ Beginner Pitfalls & Common Mistakes
@@ -421,3 +483,4 @@ string reverseWords(string s) {
 ---
 
 > 👉 Next, open `06-Recursion.md` to explore the beauty of recursive call stacks! 💪
+

@@ -816,4 +816,37 @@ bool checkInclusion(string s1, string s2) {
 | Fruit Into Baskets | Medium | https://leetcode.com/problems/fruit-into-baskets/ |
 | Maximum Erasure Value | Medium | https://leetcode.com/problems/maximum-erasure-value/ |
 
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What is the Sliding Window technique, and when should you use it?
+**Answer:**
+Sliding Window is an optimization technique used to transform nested loop $O(n^2)$ subarray/substring searches into linear $O(n)$ time by maintaining a contiguous window defined by two pointers (`left` and `right`).
+Use it when:
+1. The problem involves **contiguous sub-arrays or sub-strings**.
+2. Asking for min/max length, max sum, or sub-arrays satisfying a specific condition (e.g. at most $k$ zeros).
+
+### Q2: What is the key difference between Fixed-Size and Variable-Size Sliding Windows?
+**Answer:**
+- **Fixed-Size Window:** Window length $K$ is constant. Expand `right`, add incoming element, and when $right - left + 1 > K$, remove outgoing element at `left` ($left++$).
+- **Variable-Size Window:** Window size grows dynamically ($right++$) until a condition is violated, then shrinks dynamically ($left++$) until the condition becomes valid again.
+
+### Q3: Why is the overall time complexity of Variable Sliding Window $O(n)$ even with a nested `while` loop?
+**Answer:**
+Because both the `right` pointer and the `left` pointer only move forward from $0$ to $n-1$. Each element is added to the window at most once by `right` and removed at most once by `left`. Therefore, total operations are at most $2n$, giving $O(n)$ time complexity.
+
+### Q4: How do you calculate the number of valid sub-arrays inside a sliding window?
+**Answer:**
+If a window $[left, right]$ satisfies a monotonic condition, the number of valid sub-arrays ending at `right` is given by:
+$$\text{Count} = right - left + 1$$
+This accounts for all sub-arrays starting at any index from $left$ to $right$ and ending at $right$.
+
+### Q5: How does sliding window compare to Two Pointers?
+**Answer:**
+Sliding Window is a specialized form of Two Pointers focused on **contiguous sub-segments** of an array or string. General Two Pointers (like 2Sum on sorted array) operate on non-contiguous elements from opposite ends of a sorted array.
+
+---
+
 > 🌟 **Do them top to bottom.** Solve 643 until it's boring, THEN move down. Each next problem is a small twist, not a new mountain. That's the secret to sliding window — it only looks like 9 problems; it's really *one idea, dressed 9 ways.* I'm right here for any doubt. 💪 — *Ajai Raj (Mentor)*
+

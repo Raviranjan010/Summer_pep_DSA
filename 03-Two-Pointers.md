@@ -451,6 +451,49 @@ int removeDuplicates(vector<int>& nums) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `nums = [0, 0, 1, 1, 1, 2, 2, 33]`
+
+| `fast` | `nums[fast]` | `nums[slow]` | Condition `nums[fast] != nums[slow]` | Action | Array State |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | 0 | 0 | False | No action | `[0, 0, 1, 1, 1, 2, 2, 33]` |
+| 2 | 1 | 0 | True | `slow`=1, `nums[1]`=1 | `[0, 1, 1, 1, 1, 2, 2, 33]` |
+| 3 | 1 | 1 | False | No action | `[0, 1, 1, 1, 1, 2, 2, 33]` |
+| 4 | 1 | 1 | False | No action | `[0, 1, 1, 1, 1, 2, 2, 33]` |
+| 5 | 2 | 1 | True | `slow`=2, `nums[2]`=2 | `[0, 1, 2, 1, 1, 2, 2, 33]` |
+| 6 | 2 | 2 | False | No action | `[0, 1, 2, 1, 1, 2, 2, 33]` |
+| 7 | 33 | 2 | True | `slow`=3, `nums[3]`=33 | `[0, 1, 2, 33, 1, 2, 2, 33]` |
+
+**Returned New Length:** `slow + 1 = 4` (Unique subarray: `[0, 1, 2, 33]`) ✅
+</details>
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What is the main prerequisites for using the two-pointer technique in Two-Sum problems?
+**Answer:**
+The input array must be **sorted**. If the array is unsorted, moving `left` rightward or `right` leftward does not give a deterministic guarantee of increasing or decreasing the sum, rendering the two-pointer strategy invalid unless sorted first.
+
+### Q2: What are the two primary variations of Two-Pointers?
+**Answer:**
+1. **Opposite-Direction Pointers (Meeting-in-the-middle):** One pointer starts at index `0` (`left`) and another at `n-1` (`right`). Used in Pair Sum, Palindrome Check, Container With Most Water.
+2. **Same-Direction Pointers (Fast & Slow / Reader & Writer):** Both pointers start at index `0` and move forward at different speeds or conditions. Used in Remove Duplicates, Move Zeroes, Cycle Detection.
+
+### Q3: Why is Two-Pointer preferred over nested loops for Pair Sum problems?
+**Answer:**
+Nested loops check every possible pair, resulting in $O(n^2)$ time complexity. Two-Pointer takes advantage of array sorting to eliminate invalid pairs at each step, reducing time complexity to $O(n)$ with $O(1)$ extra space.
+
+### Q4: Explain Floyd’s Cycle Detection Algorithm (Tortoise and Hare).
+**Answer:**
+It uses two pointers: a **Slow** pointer moving 1 step at a time and a **Fast** pointer moving 2 steps at a time. If a cycle exists, the fast pointer will eventually enter the cycle and catch up to the slow pointer from behind (they will meet). If no cycle exists, fast reaches `null`.
+
+### Q5: How do you handle duplicate values in 3Sum (`a + b + c = 0`) using two pointers?
+**Answer:**
+After processing a valid triplet or incrementing/decrementing pointers, skip duplicate elements by advancing `left` while `nums[left] == nums[left + 1]` and decrementing `right` while `nums[right] == nums[right - 1]`.
+
 ---
 
 ## ⚠️ Beginner Pitfalls & Common Mistakes
@@ -467,3 +510,4 @@ int removeDuplicates(vector<int>& nums) {
 ---
 
 > 👉 Next, open `04-Binary-Search.md` to see how we search sorted lists at lightning speed! 💪
+

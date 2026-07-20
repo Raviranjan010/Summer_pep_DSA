@@ -327,20 +327,61 @@ int formulaSum(int n) {
 ```
 </details>
 
+
 ---
 
-## Mini Glossary (Bookmark This)
+## 📋 Step-by-Step Dry Run Example
 
-| Term | Plain-English Meaning |
-| :--- | :--- |
-| **Index** | Box number in an array. Always starts at **0**. |
-| **Iterate** | Loop through a collection of items one by one. |
-| **Pointer** | A variable containing a position or address (like index variables `left` or `right`). |
-| **Brute Force** | The simplest correct solution, even if inefficient. |
-| **Optimize** | Redesigning code to make it run faster or consume less memory. |
-| **Dry Run** | Tracing through code manually using pencil and paper, writing down variable values step-by-step. |
-| **In-place** | Modifying the input data structure directly without using large extra helper structures (meaning $O(1)$ auxiliary space). |
+### Sum of First N Numbers (`n = 4`)
+
+#### Loop Approach:
+- **Input:** `n = 4`
+- **Initial State:** `sum = 0`
+- **Iteration 1 (`i = 1`):** `sum = 0 + 1 = 1`
+- **Iteration 2 (`i = 2`):** `sum = 1 + 2 = 3`
+- **Iteration 3 (`i = 3`):** `sum = 3 + 3 = 6`
+- **Iteration 4 (`i = 4`):** `sum = 6 + 4 = 10`
+- **Loop Terminates:** `i = 5 > n (4)`
+- **Result:** `10` ✅
+
+#### Formula Approach:
+- **Formula:** `n * (n + 1) / 2`
+- **Step 1:** `4 + 1 = 5`
+- **Step 2:** `4 * 5 = 20`
+- **Step 3:** `20 / 2 = 10`
+- **Result:** `10` ✅ (Executes in 1 step regardless of $N$)
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What is the primary difference between Stack memory and Heap memory?
+**Answer:**
+- **Stack Memory:** Used for static memory allocation, function call frames, and primitive local variables. Memory is allocated and deallocated automatically in a LIFO order. Access is extremely fast.
+- **Heap Memory:** Used for dynamic memory allocation (objects, dynamic arrays). Access is slower because data is referenced via memory pointers/addresses on the stack, and memory must be managed manually or by a Garbage Collector.
+
+### Q2: Why do array indices start at 0 instead of 1?
+**Answer:**
+Array indices represent a memory **offset** from the starting base address. The address of $arr[i]$ is calculated as:
+$$\text{Address}(arr[i]) = \text{Base Address} + (i \times \text{Size of Type})$$
+For index 0, offset is $0 \times \text{Size} = 0$, pointing directly to the base address. Zero-based indexing removes the extra subtraction step $(i - 1)$ during address calculation.
+
+### Q3: What is the difference between Big-O, Big-Omega ($\Omega$), and Big-Theta ($\Theta$)?
+**Answer:**
+- **Big-O ($O$):** Upper bound of growth rate (worst-case scenario).
+- **Big-Omega ($\Omega$):** Lower bound of growth rate (best-case scenario).
+- **Big-Theta ($\Theta$):** Tight bound of growth rate (where worst-case and best-case match or bound the growth rate tightly).
+
+### Q4: What is the difference between Auxiliary Space and Total Space Complexity?
+**Answer:**
+- **Total Space Complexity:** Includes both the input data size + extra memory used by the algorithm.
+- **Auxiliary Space:** Measures **only the extra or temporary memory** allocated by the algorithm outside the original input. In DSA interviews, Auxiliary Space is usually what interviewers evaluate.
+
+### Q5: In the formula `n * (n + 1) / 2`, what potential bug can occur for large values of `n` in languages like C++ or Java?
+**Answer:**
+For large $n$ (e.g., $n = 10^5$), $n \times (n + 1)$ evaluates to $\approx 10^{10}$, which exceeds the maximum value of a 32-bit signed integer ($2 \times 10^9$). This leads to **Integer Overflow**. To avoid this, cast to `long` (Java) or `long long` (C++): `(long long)n * (n + 1) / 2`.
 
 ---
 
 > 👉 Once these basics feel clear, open `01-Git-And-GitHub.md` to learn how to store and track your code safely! 💪
+

@@ -439,6 +439,33 @@ Input: `nums = [1, 2, 3, 4]`
 
 ---
 
+## 🎓 Viva Questions & Answers
+
+### Q1: What is the core intuition behind the Prefix Sum technique?
+**Answer:**
+Prefix Sum is a precomputation technique where we construct an auxiliary array $P$ where $P[i]$ holds the sum of elements from index $0$ to $i$. This transforms any subarray sum query $\sum_{k=L}^{R} arr[k]$ from $O(n)$ time into an instantaneous $O(1)$ calculation: $P[R] - P[L-1]$.
+
+### Q2: Why is 1-based indexing (Prefix array of size $N+1$) preferred in implementation?
+**Answer:**
+Using a prefix array `P` of size $N+1$ with `P[0] = 0` eliminates special-case branching when $L = 0$. The subarray sum from index $L$ to $R$ (0-indexed in the original array) becomes simply `P[R + 1] - P[L]`.
+
+### Q3: How does Prefix Sum help solve Subarray Sum Equals K ($O(n)$ time complexity)?
+**Answer:**
+For any current index $i$ with prefix sum $S_i$, we are looking for a previous index $j$ such that $S_i - S_j = K \implies S_j = S_i - K$. By storing the frequencies of all previous prefix sums in a HashMap, we can check if $S_i - K$ exists in $O(1)$ time per element, achieving $O(n)$ total time instead of $O(n^2)$.
+
+### Q4: What is a Difference Array, and how does it relate to Prefix Sum?
+**Answer:**
+A Difference Array $D$ is used for $O(1)$ range update operations $+V$ on subarray $[L, R]$. We update $D[L] += V$ and $D[R + 1] -= V$. Taking the prefix sum of $D$ at the end reconstructs the modified array in $O(n)$ total time.
+
+### Q5: How do 2D Prefix Sums work?
+**Answer:**
+For a 2D matrix, $P[i][j]$ stores the sum of all elements in the submatrix from $(0, 0)$ to $(i, j)$:
+$$P[i][j] = \text{mat}[i][j] + P[i-1][j] + P[i][j-1] - P[i-1][j-1]$$
+To query the sum of submatrix between top-left $(r_1, c_1)$ and bottom-right $(r_2, c_2)$ in $O(1)$:
+$$\text{Sum} = P[r_2][c_2] - P[r_1-1][c_2] - P[r_2][c_1-1] + P[r_1-1][c_1-1]$$
+
+---
+
 ## ⚠️ Beginner Pitfalls & Common Mistakes
 
 1. **Off-by-One on Range Sum Queries:**
@@ -452,3 +479,4 @@ Input: `nums = [1, 2, 3, 4]`
 ---
 
 > 👉 Next, open `09-Sliding-Window.md` to learn how we track contiguous sub-arrays dynamically! 💪
+

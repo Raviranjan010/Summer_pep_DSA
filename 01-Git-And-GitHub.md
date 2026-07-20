@@ -164,19 +164,53 @@ DSA-Preparation/
     └── Solution.py
 ```
 
+
 ---
 
-## 🎯 Daily Habits & Practice Tasks
+## 📋 Step-by-Step Dry Run: Git Workflow Lifecycle
 
-To test your Git knowledge, complete this checklist:
+### Scenario: Creating, Editing, Branching, and Merging
 
-- [ ] Create a dummy folder named `git-practice`.
-- [ ] Initialize Git in it (`git init`).
-- [ ] Create a file named `hello.txt` and write "Hello Git" inside.
-- [ ] Stage and commit the file (`git add hello.txt`, `git commit -m "Add hello"`).
-- [ ] Modify `hello.txt` to say "Hello Git and GitHub".
-- [ ] Run `git status` to see the modified status.
-- [ ] Commit the update.
-- [ ] Run `git log` to see your two commits in order.
+- **Initial State:** On branch `main`, working directory clean.
+- **Step 1 (`git checkout -b feature-arrays`):** Creates branch `feature-arrays` and moves `HEAD` pointer to it.
+- **Step 2 (`echo "solution" > solution.py`):** File `solution.py` is in **Untracked** state in Working Directory.
+- **Step 3 (`git add solution.py`):** File moves to the **Staging Area** (Index). Git creates a blob object in `.git/objects`.
+- **Step 4 (`git commit -m "Add array solution"`):** Git creates a commit object pointing to the staged tree object. `HEAD` moves to the new commit.
+- **Step 5 (`git checkout main`):** `HEAD` moves back to `main`. `solution.py` disappears from the working tree.
+- **Step 6 (`git merge feature-arrays`):** Performs a **Fast-Forward Merge** moving `main` forward to point to `feature-arrays` commit. `HEAD` is updated.
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What are the 3 main states of a file in Git?
+**Answer:**
+1. **Working Directory (Untracked / Modified):** Files modified or created locally on disk but not yet added to Git tracking.
+2. **Staging Area / Index (Staged):** Files marked for inclusion in the upcoming commit snapshot (`git add`).
+3. **Repository / `.git` directory (Committed):** Data safely stored in Git's local object database (`git commit`).
+
+### Q2: What is the difference between `git merge` and `git rebase`?
+**Answer:**
+- **`git merge`:** Combines changes from one branch into another by creating a new **merge commit** (preserves complete historical timeline).
+- **`git rebase`:** Moves or re-applies commits from a branch on top of another base tip, creating a **linear history** (rewrites commit hashes).
+
+### Q3: What is the difference between `git fetch` and `git pull`?
+**Answer:**
+- **`git fetch`:** Downloads new branches and commits from the remote repository to your local `.git` database without modifying your local working files.
+- **`git pull`:** Performs `git fetch` followed immediately by `git merge` to integrate remote changes directly into your active local working branch.
+
+### Q4: What is a "Detached HEAD" state in Git?
+**Answer:**
+A detached `HEAD` state occurs when `HEAD` points directly to a specific commit hash rather than a local branch reference (e.g. after running `git checkout <commit-hash>`). Any new commits created in this state won't belong to any branch and will eventually be garbage-collected unless saved into a new branch.
+
+### Q5: How do you resolve a Merge Conflict?
+**Answer:**
+1. Git pauses the merge and inserts conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) into affected files.
+2. Open the file, choose desired lines/logic, and manually delete conflict marker lines.
+3. Stage the resolved files using `git add <filename>`.
+4. Finalize the resolution by creating the commit with `git commit`.
+
+---
 
 > 🏆 **Habit Goal:** Commit and push your code every single day. Even if it is just a single line of comments or a simple bug fix. Consistency is key!
+

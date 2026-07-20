@@ -798,6 +798,60 @@ ListNode* oddEvenList(ListNode* head) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `head = [1, 2, 3, 4, 5]`
+
+- Initial pointers: `odd` $\to 1$, `even` $\to 2$, `evenHead` $\to 2$
+- **Iteration 1 (`even = 2`):**
+  - `odd.next = even.next` (3) $\implies$ `odd` chain: $1 \to 3$
+  - `odd = 3`
+  - `even.next = odd.next` (4) $\implies$ `even` chain: $2 \to 4$
+  - `even = 4`
+- **Iteration 2 (`even = 4`):**
+  - `odd.next = even.next` (5) $\implies$ `odd` chain: $1 \to 3 \to 5$
+  - `odd = 5`
+  - `even.next = odd.next` (`null`) $\implies$ `even` chain: $2 \to 4 \to \text{null}$
+  - `even = null`
+- Loop terminates (`even == null`).
+- Connect chains: `odd.next = evenHead` ($5 \to 2$).
+
+**Result:** `[1, 3, 5, 2, 4]` ✅
+</details>
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What is the primary difference in memory allocation between Arrays and Linked Lists?
+**Answer:**
+- **Array:** Continuous block of memory allocated contiguously. Size is fixed (or requires re-allocation), and random access is $O(1)$.
+- **Linked List:** Dynamic nodes scattered non-contiguously in Heap memory connected by reference pointers. Insertion/deletion is $O(1)$ if pointer reference is known, but element access is $O(n)$.
+
+### Q2: What is a Dummy Head Pointer Node, and why is it useful?
+**Answer:**
+A **Dummy Node** is a placeholder node (`ListNode dummy = new ListNode(0)`) placed before `head`. It simplifies code by eliminating edge cases when inserting or deleting at the very beginning of the list, allowing uniform pointer operations. `dummy.next` returns the modified actual head.
+
+### Q3: Why is Floyd's Cycle Detection algorithm guaranteed to find a cycle if one exists?
+**Answer:**
+Let the fast pointer move 2 steps and slow pointer move 1 step. In each step, the distance between `fast` and `slow` inside the cycle decreases by $1$ node ($(2 - 1) = 1$). If the cycle length is $C$, `fast` will catch up to `slow` in at most $C$ steps after both enter the cycle.
+
+### Q4: Compare Singly Linked List vs Doubly Linked List vs Circular Linked List.
+**Answer:**
+- **Singly Linked List:** Each node has a `val` and `next` pointer. Uses less memory per node, but can only traverse forward.
+- **Doubly Linked List:** Each node has `val`, `next`, and `prev` pointers. Allows bi-directional traversal and $O(1)$ deletion given node reference, but uses extra pointer memory.
+- **Circular Linked List:** Tail node's `next` points back to `head` (or head's `prev` points to tail). Useful for round-robin scheduling algorithms.
+
+### Q5: How do you reverse a Singly Linked List in $O(n)$ time and $O(1)$ space?
+**Answer:**
+Maintain three pointers: `prev = null`, `curr = head`, and `next = null`.
+In a loop while `curr != null`:
+1. Save `next = curr.next`.
+2. Reverse link: `curr.next = prev`.
+3. Advance: `prev = curr`, `curr = next`.
+Return `prev` as the new head.
+
 ---
 
 ## ⚠️ Beginner Pitfalls & Common Mistakes
@@ -814,3 +868,4 @@ ListNode* oddEvenList(ListNode* head) {
 ---
 
 > 👉 Next, open `11-Stack.md` to explore LIFO stack operations! 💪
+

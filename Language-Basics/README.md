@@ -2,11 +2,12 @@
 
 > **Stuck on syntax, not logic?** This folder is for you. Whenever you know *what* to do but forget *how to write it* — how to make a map, count frequencies, sort descending — look here.
 
-| File | For | Highlights |
-|------|-----|-----------|
-| `Java-Basics.md` | Java users | `getOrDefault`, StringBuilder, comparators, `char - 'a'` |
-| `Cpp-Basics.md` | C++ users | `mp[c]++`, `sort(rbegin, rend)`, vectors, pairs |
-| `Python-Basics.md` | Python users | `Counter`, slicing `s[::-1]`, `sorted(key=...)` |
+| File | For | Highlights | Coverage |
+|------|-----|-----------|---|
+| `Java-Basics.md` | Java users | `getOrDefault`, StringBuilder, comparators, `char - 'a'` | 🎓 Viva Q&A + 📋 Dry Run |
+| `Cpp-Basics.md` | C++ users | `mp[c]++`, `sort(rbegin, rend)`, vectors, pairs | 🎓 Viva Q&A + 📋 Dry Run |
+| `Python-Basics.md` | Python users | `Counter`, slicing `s[::-1]`, `sorted(key=...)` | 🎓 Viva Q&A + 📋 Dry Run |
+
 
 ---
 

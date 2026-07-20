@@ -447,6 +447,52 @@ char findTheDifference(string s, string t) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `s = "abcd"`, `t = "abcde"`
+
+Using XOR property ($X \oplus X = 0, X \oplus 0 = X$):
+- `extra = 0`
+- XOR `s`: `'a' ^ 'b' ^ 'c' ^ 'd'`
+- XOR `t`: `'a' ^ 'b' ^ 'c' ^ 'd' ^ 'e'`
+- Combined XOR: `('a' ^ 'a') ^ ('b' ^ 'b') ^ ('c' ^ 'c') ^ ('d' ^ 'd') ^ 'e'`
+- Pairs cancel out to 0: `0 ^ 0 ^ 0 ^ 0 ^ 'e' = 'e'`
+
+**Result:** `'e'` ✅
+</details>
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What is a Hash Table, Hash Function, and Load Factor?
+**Answer:**
+- **Hash Table:** A data structure that stores key-value pairs using array indexing under the hood.
+- **Hash Function:** A function that maps an arbitrary key (e.g. string, object) to a fixed-size integer array index.
+- **Load Factor:** The ratio of total items stored $n$ to total table capacity $k$ ($\text{Load Factor} = n / k$). When it exceeds a threshold (e.g., $0.75$), rehashing occurs to double table size.
+
+### Q2: What are the two primary Collision Resolution Techniques?
+**Answer:**
+1. **Chaining (Separate Chaining):** Each array bucket contains a linked list (or balanced binary tree) storing all key-value pairs that hash to that same index.
+2. **Open Addressing:** All elements are stored directly in the table array. On collision, search for another empty slot using **Linear Probing** ($i + 1$), **Quadratic Probing** ($i + c_1k + c_2k^2$), or **Double Hashing**.
+
+### Q3: What is the Average vs Worst Case time complexity of HashMap operations?
+**Answer:**
+- **Average Case:** $O(1)$ for Search, Insert, and Delete.
+- **Worst Case:** $O(n)$ if all keys hash to the same bucket index (hash collision flood). Note: Java 8+ mitigates this to $O(\log n)$ by switching long chains to Red-Black trees.
+
+### Q4: What is the difference between `HashSet` and `HashMap`?
+**Answer:**
+- **`HashMap`:** Stores key-value pairs (`Map<K, V>`), keys must be unique, values can be duplicated.
+- **`HashSet`:** Stores unique elements (`Set<E>`). Internally implemented using a `HashMap` where elements act as keys paired with a dummy object value.
+
+### Q5: Can custom objects be used as HashMap keys? What are the requirements?
+**Answer:**
+Yes, but you **must override both `hashCode()` and `equals()`** methods.
+- If two objects are equal according to `equals()`, they **must produce the same `hashCode()`**.
+- Objects used as keys must be **immutable** so their hash code does not change after insertion.
+
 ---
 
 ## ⚠️ Beginner Pitfalls & Common Mistakes
@@ -460,3 +506,4 @@ char findTheDifference(string s, string t) {
 ---
 
 > 👉 Next, open `08-Prefix-Sum.md` to learn how precomputations unlock range query optimization! 💪
+

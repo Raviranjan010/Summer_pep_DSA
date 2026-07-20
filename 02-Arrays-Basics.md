@@ -265,6 +265,20 @@ int search(vector<int>& arr, int target) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `arr = [10, 20, 30, 40, 50]`, `target = 30`
+
+| Iteration `i` | `arr[i]` | `arr[i] == target` | Action |
+| :---: | :---: | :---: | :---: |
+| 0 | 10 | `10 == 30` (False) | Continue loop |
+| 1 | 20 | `20 == 30` (False) | Continue loop |
+| 2 | 30 | `30 == 30` (True) | Return index `2` |
+
+**Returned Value:** 2 ✅
+</details>
+
 ---
 
 ### Solution 4: Find Numbers with Even Number of Digits
@@ -422,4 +436,30 @@ Input: `nums = [1, 2, 3, 4]`
 
 ---
 
+## 🎓 Viva Questions & Answers
+
+### Q1: Why is array element access $O(1)$ while searching for an unindexed element is $O(n)$?
+**Answer:**
+Array elements are stored in contiguous memory locations. Indexing uses direct arithmetic calculation $\text{Base} + (i \times \text{Size})$ to access any position in constant time $O(1)$. Searching requires inspecting elements one by one until a match is found, taking $O(n)$ time in the worst case.
+
+### Q2: What is Spatial Locality and why does it make arrays faster than linked lists?
+**Answer:**
+Spatial Locality refers to the likelihood that adjacent memory locations will be accessed together. Arrays store elements contiguously, so loading an element fetches an entire CPU cache line containing surrounding elements into high-speed cache. Linked lists store nodes non-contiguously in heap memory, causing frequent CPU cache misses.
+
+### Q3: What is Row-Major Order vs Column-Major Order in 2D Arrays?
+**Answer:**
+- **Row-Major Order:** Elements of each row are placed sequentially in 1D RAM memory (e.g. Row 0, Row 1, Row 2). Address formula: $\text{Base} + (i \times \text{cols} + j) \times \text{element\_size}$. Used in C++, Python, C.
+- **Column-Major Order:** Elements of each column are placed sequentially in RAM (e.g. Col 0, Col 1, Col 2). Used in MATLAB, Fortran.
+
+### Q4: Why is inserting or deleting an element in the middle of an array $O(n)$?
+**Answer:**
+Because arrays require contiguous memory alignment, inserting or deleting an element at index $k$ requires shifting all subsequent $n - 1 - k$ elements right or left by one position to preserve continuous layout.
+
+### Q5: How do dynamic arrays (like Java `ArrayList` or C++ `std::vector`) handle resizing?
+**Answer:**
+When a dynamic array reaches full capacity, it allocates a new larger array (typically $1.5\times$ or $2\times$ the original capacity), copies all existing elements over, and frees the old array. Because resizing occurs infrequently, insertion has an **Amortized Time Complexity of $O(1)$**.
+
+---
+
 > 👉 Next, open `03-Two-Pointers.md` to see how we can optimize dual search variables! 💪
+

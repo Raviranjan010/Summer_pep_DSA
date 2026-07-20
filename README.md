@@ -11,21 +11,22 @@
 
 Each file is **one topic**. Open them in this order. Don't rush. One topic per day is a great pace.
 
-| # | File | What You'll Learn |
-|---|------|-------------------|
-| 0 | `00-Start-Here-Basics.md` | What is an array, Big-O, the 4-question ritual (the floor) |
-| 1 | `01-Git-And-GitHub.md` | Saving your code, daily upload habit |
-| 2 | `02-Arrays-Basics.md` | Arrays, max/min, sum, linear search |
-| 3 | `03-Two-Pointers.md` | The two-pointer trick (reverse, pair-sum) |
-| 4 | `04-Binary-Search.md` | Lightning-fast search on sorted arrays |
-| 5 | `05-Strings.md` | Reverse, palindrome, anagram, frequency count |
-| 6 | `06-Recursion.md` | Down vs up, leap of faith, factorial, fibonacci, 8 worked problems |
-| 7 | `07-Hashing.md` | HashSet vs HashMap, Two Sum, frequency counting, 6 worked problems |
-| 8 | `08-Prefix-Sum.md` | "Remember, don't recalculate" — running sums, pivot, product-except-self |
-| 9 | `09-Sliding-Window.md` | Fixed & variable windows — the slow, clear guide with 9 worked problems |
-| 10 | `10-Linked-List.md` | Day 1 foundations + Day 2 interview combos — 12 problems, ~90% of LL patterns |
-| 11 | `11-Stack.md` | Day 1: LIFO, array/LL stack, brackets. Day 2: Monotonic stack, Min Stack, RPN — 9 worked problems |
-| 12 | `12-Queue.md` | Day 1: FIFO basics + simulation. Day 2: Stack↔Queue, Monotonic Deque, BFS — 10 worked problems |
+| # | File | What You'll Learn | Viva Q&A & Dry Run Coverage |
+|---|------|-------------------|-----------------------------|
+| 0 | `00-Start-Here-Basics.md` | What is an array, Big-O, stack vs heap, 4-question ritual | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 1 | `01-Git-And-GitHub.md` | Saving your code, daily upload habit, git branching & merge lifecycle | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 2 | `02-Arrays-Basics.md` | Arrays, max/min, sum, linear search, cache locality | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 3 | `03-Two-Pointers.md` | The two-pointer trick (reverse, pair-sum, duplicates) | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 4 | `04-Binary-Search.md` | Lightning-fast search on sorted arrays, search space reduction | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 5 | `05-Strings.md` | Reverse, palindrome, anagram, frequency count, immutability | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 6 | `06-Recursion.md` | Down vs up, leap of faith, factorial, fibonacci, 8 worked problems | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 7 | `07-Hashing.md` | HashSet vs HashMap, Two Sum, frequency counting, 6 worked problems | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 8 | `08-Prefix-Sum.md` | "Remember, don't recalculate" — running sums, pivot, product-except-self | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 9 | `09-Sliding-Window.md` | Fixed & variable windows — the slow, clear guide with 9 worked problems | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 10 | `10-Linked-List.md` | Day 1 foundations + Day 2 interview combos — 12 problems, ~90% of LL patterns | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 11 | `11-Stack.md` | Day 1: LIFO, array/LL stack, brackets. Day 2: Monotonic stack, Min Stack, RPN — 9 worked problems | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+| 12 | `12-Queue.md` | Day 1: FIFO basics + simulation. Day 2: Stack↔Queue, Monotonic Deque, BFS — 10 worked problems | 🎓 Viva Q&A + 📋 Step-by-Step Dry Run |
+
 
 > 📌 *Sorting will be added soon as its own file — leaving a clear spot for it once it's taught.*
 

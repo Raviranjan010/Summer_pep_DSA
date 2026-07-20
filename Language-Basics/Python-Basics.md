@@ -241,3 +241,47 @@ words = ["apple", "banana", "kiwi"]
 words.sort(key=len)                 # sort by length: ["kiwi", "apple", "banana"]
 words.sort(key=lambda w: -len(w))   # sort by length descending
 ```
+
+---
+
+## 📋 Step-by-Step Dry Run: Python Frequency Counter (`dict.get`)
+
+```python
+s = "aba"
+mp = {}
+for ch in s:
+    mp[ch] = mp.get(ch, 0) + 1
+```
+
+- **Iteration 1 (`ch = 'a'`):** `mp.get('a', 0)` returns `0`. `mp['a'] = 0 + 1 = 1`. State: `{'a': 1}`.
+- **Iteration 2 (`ch = 'b'`):** `mp.get('b', 0)` returns `0`. `mp['b'] = 0 + 1 = 1`. State: `{'a': 1, 'b': 1}`.
+- **Iteration 3 (`ch = 'a'`):** `mp.get('a', 0)` returns `1`. `mp['a'] = 1 + 1 = 2`. State: `{'a': 2, 'b': 1}`.
+
+**Final Dict:** `{'a': 2, 'b': 1}` ✅
+
+---
+
+## 🎓 Python Viva Questions & Answers
+
+### Q1: What is the difference between Mutable and Immutable data types in Python?
+**Answer:**
+- **Immutable Types (`int`, `float`, `str`, `tuple`, `frozenset`):** State cannot be modified after creation. Operations modifying an immutable object return a new object in memory.
+- **Mutable Types (`list`, `dict`, `set`):** State can be altered in-place without changing object identity (`id()`).
+
+### Q2: Why does `[[0] * 4] * 3` create a dangerous bug in 2D lists?
+**Answer:**
+The outer `* 3` multiplication duplicates references to the **same single inner list object** 3 times. Modifying `grid[0][0] = 5` will simultaneously alter `grid[1][0]` and `grid[2][0]`.
+To create independent rows, use list comprehension: `[[0] * 4 for _ in range(3)]`.
+
+### Q3: How does Python's `heapq` module work, and how do you implement a Max Heap?
+**Answer:**
+`heapq` implements a **Min-Heap** in-place over standard Python lists (where `heap[0]` is the smallest element). To simulate a **Max-Heap**, negate all numeric values (`-val`) when pushing (`heappush(heap, -x)`) and negate them back when popping (`-heappop(heap)`).
+
+### Q4: What is the difference between `list.sort()` and `sorted(list)` in Python?
+**Answer:**
+- **`list.sort()`:** Modifies the existing list in-place and returns `None` ($O(1)$ extra space).
+- **`sorted(iterable)`:** Returns a brand-new sorted list while keeping the original iterable unchanged ($O(n)$ extra space).
+
+### Q5: What is Python's Global Interpreter Lock (GIL)?
+**Answer:**
+The GIL is a mutex lock in CPython that prevents multiple native threads from executing Python bytecode simultaneously. While it restricts CPU-bound multithreading, it simplifies memory management and thread safety for built-in C extensions.

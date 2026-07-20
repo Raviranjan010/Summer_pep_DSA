@@ -489,6 +489,52 @@ int search(vector<int>& nums, int target) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Call Stack Dry Run</summary>
+
+Input: `nums = [2, 5, 8, 12, 16]`, `target = 12`
+
+1. `binarySearch(nums, low=0, high=4, target=12)`
+   - `mid = 0 + (4 - 0) / 2 = 2`
+   - `nums[2] = 8 < 12` $\rightarrow$ Recurse on right half (`low = 3, high = 4`)
+2. `binarySearch(nums, low=3, high=4, target=12)`
+   - `mid = 3 + (4 - 3) / 2 = 3`
+   - `nums[3] = 12 == 12` $\rightarrow$ Found! Return `3`
+3. Returns `3` up the call stack.
+
+**Result:** `3` ✅
+</details>
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: What are the two mandatory components of every recursive function?
+**Answer:**
+1. **Base Case:** The condition under which the function stops calling itself and returns a value directly, preventing infinite recursion.
+2. **Recursive Step:** The logic that breaks the problem into smaller sub-problems and makes a self-call moving closer to the base case.
+
+### Q2: What causes a StackOverflow Error during recursion?
+**Answer:**
+A `StackOverflowError` occurs when the recursive function exceeds the maximum allocated memory limit of the call stack. Common causes include:
+- Missing or unreachable base case.
+- Recursive step failing to reduce the problem size toward the base case.
+- Excessively deep recursion depth ($n > 10^5$).
+
+### Q3: What is Tail Recursion, and what is Tail Call Optimization (TCO)?
+**Answer:**
+- **Tail Recursion:** A form of recursion where the recursive call is the **very last operation** performed in the function (no extra math or operations after the call returns).
+- **Tail Call Optimization (TCO):** A compiler optimization where the current stack frame is reused for the recursive call instead of pushing a new frame, turning $O(n)$ call stack memory into $O(1)$.
+
+### Q4: Compare Recursion vs Iteration in terms of memory and performance.
+**Answer:**
+- **Recursion:** More elegant and readable for hierarchical structures (Trees, Graphs, Backtracking), but incurs **call stack memory overhead** $O(depth)$ and function-call CPU overhead.
+- **Iteration:** Uses loops with $O(1)$ auxiliary space and no call stack overhead, making it faster and memory-efficient for simple linear repetitions.
+
+### Q5: How does the Call Stack store local variables during recursive calls?
+**Answer:**
+Each time a recursive function is invoked, a new **Stack Frame** (Activation Record) is pushed onto the system Stack. It contains local variables, parameters, and the return address. When the base case is reached, stack frames pop off one by one in LIFO order.
+
 ---
 
 ## ⚠️ Beginner Pitfalls & Common Mistakes
@@ -502,3 +548,4 @@ int search(vector<int>& nums, int target) {
 ---
 
 > 👉 Next, open `07-Hashing.md` to learn how we index keys and values in constant time! 💪
+

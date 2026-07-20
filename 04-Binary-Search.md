@@ -530,6 +530,45 @@ int search(vector<int>& nums, int target) {
 ```
 </details>
 
+<details>
+<summary>📋 Step-by-Step Dry Run</summary>
+
+Input: `nums = [4, 5, 6, 7, 0, 1, 2]`, `target = 0`
+
+| Iteration | `low` | `high` | `mid` | `nums[mid]` | Sorted Half | Range Check for Target `0` | Next Pointers |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | 0 | 6 | 3 | 7 | Left (`nums[0] <= 7`) | `4 <= 0 < 7` (False) | `low = mid + 1 = 4` |
+| 2 | 4 | 6 | 5 | 1 | Right (`nums[5] <= 2`) | `1 < 0 <= 2` (False) | `high = mid - 1 = 4` |
+| 3 | 4 | 4 | 4 | 0 | Match! (`nums[4] == 0`) | Return index `4` | - |
+
+**Returned Index:** `4` ✅
+</details>
+
+---
+
+## 🎓 Viva Questions & Answers
+
+### Q1: Why must the input array be sorted for Binary Search?
+**Answer:**
+Binary Search relies on the **Monotonic Property** (orderly increasing or decreasing sequence). This guarantees that comparing the middle element with the target deterministically eliminates half of the remaining search space. If unsorted, comparing `nums[mid]` gives no guarantee about where the target lies.
+
+### Q2: Why do we use `mid = low + (high - low) / 2` instead of `mid = (low + high) / 2`?
+**Answer:**
+In languages with bounded integer types (like C, C++, Java), if `low` and `high` are large positive integers (e.g. near $2 \times 10^9$), `low + high` overflows the 32-bit signed integer capacity into a negative number, producing an incorrect negative index or crash. `low + (high - low) / 2` mathematically avoids sum overflow.
+
+### Q3: What is the Lower Bound and Upper Bound in Binary Search?
+**Answer:**
+- **Lower Bound:** The index of the **first element** in a sorted array that is $\ge$ `target`.
+- **Upper Bound:** The index of the **first element** in a sorted array that is strictly $>$ `target`.
+
+### Q4: How does Binary Search work on Rotated Sorted Arrays?
+**Answer:**
+At any `mid` index in a rotated sorted array, at least one of the two halves (`[low...mid]` or `[mid...high]`) is guaranteed to be completely sorted. We identify which half is sorted, check if the target falls within that sorted half's range, and adjust `low` or `high` accordingly.
+
+### Q5: What is "Search on Answer Space" (Binary Search on Answer)?
+**Answer:**
+When the problem output is a monotonic numerical value bounded in a range $[L, R]$ (e.g. minimum eating speed, minimum capacity), we apply Binary Search over the potential answer range rather than an array. For each candidate answer `mid`, we test validity with a helper function `isPossible(mid)`.
+
 ---
 
 ## ⚠️ Beginner Pitfalls & Common Mistakes
@@ -545,3 +584,4 @@ int search(vector<int>& nums, int target) {
 ---
 
 > 👉 Next, open `05-Strings.md` to learn how character sequences are handled and optimized! 💪
+

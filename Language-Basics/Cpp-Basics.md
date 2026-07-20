@@ -242,3 +242,50 @@ p.second;   // 'a'
 vector<pair<int,int>> vp;
 vp.push_back({3, 4});
 ```
+
+---
+
+## 📋 Step-by-Step Dry Run: C++ Frequency Counter
+
+```cpp
+string s = "cba";
+vector<int> freq(26, 0);
+for (char c : s) {
+    freq[c - 'a']++;
+}
+```
+
+- Initial state: `freq` is array of 26 zeros `[0, 0, ..., 0]`
+- **Iteration 1 (`c = 'c'`):** `pos = 'c' - 'a' = 99 - 97 = 2`. `freq[2]` becomes `1`.
+- **Iteration 2 (`c = 'b'`):** `pos = 'b' - 'a' = 98 - 97 = 1`. `freq[1]` becomes `1`.
+- **Iteration 3 (`c = 'a'`):** `pos = 'a' - 'a' = 97 - 97 = 0`. `freq[0]` becomes `1`.
+
+**Final State:** `freq[0]=1, freq[1]=1, freq[2]=1` (Corresponds to 'a': 1, 'b': 1, 'c': 1). ✅
+
+---
+
+## 🎓 C++ Viva Questions & Answers
+
+### Q1: What is the difference between Pointers and References in C++?
+**Answer:**
+- **Pointer (`int* p`):** Holds the memory address of another variable. Can be `nullptr`, can be reassigned to point to different variables, and requires dereferencing (`*p`).
+- **Reference (`int& r`):** An alias for an existing variable. Must be initialized upon declaration, cannot be `null`, and cannot be reassigned to refer to another object.
+
+### Q2: Why pass vectors as `const vector<int>&` in function signatures?
+**Answer:**
+Passing by value (`vector<int> v`) copies all elements of the vector into the function frame ($O(n)$ time & space). Passing by reference (`vector<int>& v`) avoids copying ($O(1)$). Adding `const` guarantees the function cannot accidentally mutate the original vector.
+
+### Q3: What is the difference between `std::unordered_map` and `std::map` in C++?
+**Answer:**
+- **`std::unordered_map`:** Implemented using a Hash Table. Unordered keys, average $O(1)$ time complexity for search/insert/delete.
+- **`std::map`:** Implemented using a Self-Balancing Red-Black Tree. Keys are kept strictly sorted, $O(\log n)$ guaranteed time complexity for search/insert/delete.
+
+### Q4: Why is `cin.tie(NULL); ios_base::sync_with_stdio(false);` used in C++ competitive programming?
+**Answer:**
+- `ios_base::sync_with_stdio(false)` disables synchronization between C++ standard streams (`cin`/`cout`) and C stdio streams (`scanf`/`printf`), speeding up I/O.
+- `cin.tie(NULL)` unties `cin` from `cout`, preventing `cout` from flushing automatically before `cin` reads input.
+
+### Q5: How does `std::vector` manage memory capacity during expansion?
+**Answer:**
+When a `vector` exceeds its `capacity`, it allocates a new contiguous block of memory with double the capacity ($2\times$), moves existing elements over, and deallocates old memory. This ensures an **Amortized Time Complexity of $O(1)$** per push.
+
